@@ -1,0 +1,95 @@
+<!DOCTYPE html >
+<html xmlns:th="http://www.thymeleaf.org">
+<title>cse308</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<style>
+    body, h1, h2, h3, h4, h5, h6 {
+        font-family: "Raleway", Arial, Helvetica, sans-serif
+    }
+</style>
+<head>
+    <script language="javascript" type="text/javascript">
+        function Button1_onclick() {
+            if (document.myForm.login.value == "" || document.myForm.userpasswd.value == "") {
+                alert("UserName and Userpasswd Can Not Be Null!");
+            } else {
+                //session.setAttribute("User","yes" ); 
+                javascript: myForm.submit();
+            }
+            window.open("UserCenter", "_self");
+        }
+        function Button2_onclick() {
+            if (document.myForm.login.value == "" || document.myForm.userpasswd.value == "") {
+                alert("UserName and Userpasswd Can Not Be Null!");
+            } else {
+                //session.setAttribute("User","no" ); 
+                javascript: myForm.submit();
+            }
+            window.open("admincenter", "_self");
+        }
+
+        function Feedback_onclick() {
+            window.open("feedback", "_self");
+        }
+
+        function About_onclick() {
+            window.open("about", "_self");
+        }
+
+        function Index_onclick() {
+            window.open("index", "_self");
+        }
+    </script>
+</head>
+<div class="w3-bar w3-white w3-large">
+    <button class="w3-bar-item w3-button w3-yellow w3-mobile" type="submit" onclick="return Index_onclick()"><i class="w3-margin-right"></i> DogOwner</button>
+    <button class="w3-bar-item w3-button w3-mobile" type="submit" onclick="return About_onclick()"><i class="w3-margin-right"></i>About Us</button>
+    <button class="w3-bar-item w3-button w3-mobile" type="submit" onclick="return Feedback_onclick()"><i class="w3-margin-right"></i>Leave Feedback</button>
+	 <a  class="w3-bar-item w3-button  w3-right " th:href="@{/register}">Register</a>
+</div>
+<body style="font-size: 12pt; text-align: center" bgcolor="LightYellow">
+    <br />
+   
+    <img th:src="@{/image/dog.jpg}" width="1200" height="600" />
+    <br />
+    <br />
+     <form th:action="@{/login}"
+         th:object="${loginForm}" method="POST">
+        <span style="font-size: 10pt">Email :</span>
+        <input id="Text1" name="login" type="text" th:field="*{email}" />
+        <span style="font-size: 10pt">Password:</span>
+        <input id="Password1" name="userpasswd" type="password" th:field="*{pwd}" />
+        <input id="Button1" style="width: 70px; margin-top: 15px; margin-right: 10px;" type="submit" value="Login" />
+        <br />
+    </form>
+    <span style="font-size: 9pt">
+            <br />Yuege Chen, Cheng Ji, Seward Chen<br />
+            Department of Computer Science, State University of New York at Stony Brook
+            </span></strong>
+    </span><span style="font-size: 9pt"> </span>
+</body>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#loginForm").submit(function() {
+            $.ajax({
+                url: 'login',
+                type: 'POST',
+                dataType: 'json',
+                data: $('#loginForm').serialize(),
+                success: function(data) {
+                    if (data.status == "failed") {
+                        alert("login failed");
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+</html>
