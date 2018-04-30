@@ -108,10 +108,6 @@ public class MainController {
 
 		user.setUname(uname);
 		user.setEmail(email);
-		System.out.println(pwd);
-		System.out.println(email);
-		System.out.println(uname);
-		System.out.println(address);
 		user.setPwd(Encrypt.encrypt(pwd));
 		user.setPhone(phone);
 		user.setAddress(address);
@@ -122,6 +118,7 @@ public class MainController {
 
 		entitymanager.close();
 		emfactory.close();
+		login="yes";
 		model.addAttribute("user", user);
 		return "UserCenter";
 	}
