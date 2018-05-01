@@ -1,6 +1,4 @@
 package cse308.Thymeleaf.controller;
-
-
 import java.security.*;
 
 public class Encrypt

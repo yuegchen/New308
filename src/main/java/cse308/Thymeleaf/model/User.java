@@ -16,7 +16,7 @@ public class User {
 	private	String 	email;
 	private String 	uname;
 	private String 	address;
-	@Column( length = 1000000000)
+	@Column( length = 100000)
 	private String 	password;
 	private String 	phone;
 

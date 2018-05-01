@@ -1,7 +1,6 @@
 package cse308.Thymeleaf.form;
 
 public class LoginForm {
-		 
 	    private String email;
 	    private String pwd;
 	 

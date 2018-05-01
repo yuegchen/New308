@@ -16,13 +16,13 @@ public class District {
 	private 	int 		districtId;
 	private 	int 		originalDistrictId;
 	private 	int[] 		movedIntoPrecinctList;//store precincts with their id
-	private 	int[] 		borderPrecinctList;
+	private 	Precinct[] 		borderPrecinctList;
 	private 	District[] 	neighborDistricts;
 	
 	private 	int 		districtNameId;
 	private 	int[] 		precinctList;//store precincts with their id
 
-	public District( int did, int oDid, int[] inprecinctList, int[] borderPrecinctList) {
+	public District( int did, int oDid, int[] inprecinctList, Precinct[] borderPrecinctList) {
 		this.districtId				= 	did;
 		this.originalDistrictId		=	oDid;
 		this.movedIntoPrecinctList	= 	inprecinctList;
@@ -55,11 +55,11 @@ public class District {
 		this.neighborDistricts=neighborDistricts;
 	}
 	
-	public int[] getBorderPrecinctList() {
+	public Precinct[] getBorderPrecinctList() {
 		return borderPrecinctList;
 	}
 
-	public void setBorderPrecinctList(int[] BPList) {
+	public void setBorderPrecinctList(Precinct[] BPList) {
 		this.borderPrecinctList=BPList;
 	}
 
