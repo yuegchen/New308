@@ -4,22 +4,22 @@ import java.util.*;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import cse308.Thymeleaf.form.RedistrictingForm;
+import cse308.Thymeleaf.form.RegisterForm;
 import cse308.Thymeleaf.model.*;
 
 @Controller
 public class RedistrictingController {
 	private static State state;
 	private static double[] weights;
-//	private static District startDistrict;
 
 	@RequestMapping(value = { "/redistrict" }, method = RequestMethod.POST)
-	public String startAlgo(Model model) {
-//		startDistrict = findWorstDistrict(state);
-//		Precinct[] borderPrecinctList = startDistrict.getBorderPrecinctList();
-//		District[] neighborDistrictList = startDistrict.getNeighborDistricts();
+	public String startAlgo(Model model, //
+			@ModelAttribute("redistrictingForm") RedistrictingForm redistrictingForm) {
 		District[] dList = state.getDistricts();
 		for(District d:dList){
 			Precinct[] borderPrecinctList = d.getBorderPrecinctList();
@@ -49,9 +49,7 @@ public class RedistrictingController {
 		}
 		
 	}
-
-
-
+	
 	public double calculateGoodness(District d) {
 		double compactness = calculateCompactness(d, weights[0]);
 		double population = calculatePopulation(d, weights[1]);
