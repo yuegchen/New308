@@ -1,11 +1,10 @@
 $("select").append($("<option></option>")
-        .attr("value", null));
-$.each(stateNames, function(index, value){
+    .attr("value", null));
+$.each(stateNames, function(index, value) {
     $("select").append($("<option></option>")
-        .attr("value", (index+1))
+        .attr("value", (index + 1))
         .text(value));
 });
-
 
 function setMode(evt, mode) {
     var i, tab_list, tab_buttons;
@@ -24,20 +23,26 @@ function setMode(evt, mode) {
 
 
     // Call the method to initialize the active tab
-    switch(mode){
-        case "redistricting": redistricting(1, null); 
+    switch (mode) {
+        case "redistricting":
+            redistricting(1, null);
             break;
-        case "manual": init_manual(); break;
-        case "compare": break;
-        case "visualize": break;
-        default: break;
+        case "manual":
+            init_manual();
+            break;
+        case "compare":
+            break;
+        case "visualize":
+            break;
+        default:
+            break;
     }
 
     // ==============================================================================
     // ===== MANUAL MODE FUNCTIONS ==================================================
     // ==============================================================================
 
-    function init_manual(){
+    function init_manual() {
         // Make sure the map is coloring by district affiliation
         setColoring(getColor_District);
         redraw();
@@ -47,7 +52,7 @@ function setMode(evt, mode) {
         ele.innerHTML = getDistrictDisplay();
     }
 
-    function getDistrictDisplay(){
+    function getDistrictDisplay() {
         var toReturn = "";
         var districtColors = getDistrictColors();
         var districts = Object.keys(districtColors);
@@ -59,7 +64,7 @@ function setMode(evt, mode) {
             toReturn += '</tr>';
             toReturn += '</div>';
         }
-        
+
         return toReturn;
     }
 
@@ -74,22 +79,22 @@ function setMode(evt, mode) {
         document.getElementById("dsb" + district).style.display.className += " active"
     }
 
-    function redistricting(stateId, weights){
+    function redistricting(stateId, weights) {
         var params = {
-            stateId : stateId,
-            weights : weights
+            stateId: stateId,
+            weights: weights
         };
 
         $.ajax({
             url: 'redistrict',
             type: 'POST',
             dataType: 'json',
-            success: function(response){
+            success: function(response) {
                 console.log(response.plan.state);
                 var dList = response.plan.state.dList;
-                dList.forEach(function(district){
-                    if (district.precinctList != null){
-                        district.precinctList.forEach(function(changedPrecinct){
+                dList.forEach(function(district) {
+                    if (district.precinctList != null) {
+                        district.precinctList.forEach(function(changedPrecinct) {
                             setPrecinctDistrict(changedPrecinct, district.districtNameId);
                         });
                     }
@@ -100,4 +105,3 @@ function setMode(evt, mode) {
         });
     }
 }
-

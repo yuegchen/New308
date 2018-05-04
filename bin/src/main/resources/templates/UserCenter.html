@@ -1,0 +1,186 @@
+<!-- <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%> -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<title>CSE308_Customer</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto'>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script language="javascript" type="text/javascript">
+  // <!CDATA[
+
+  function About_onclick() {
+    window.open("about","_self");
+  }
+  function Button3_onclick() {
+      window.open("register","_self");
+  }
+  function Feedback_onclick() {
+      window.open("feedback","_self");
+  }
+  function Index_onclick() {
+	  window.open("index","_self");
+  }
+  // ]]>
+  </script>
+<body class="w3-light-grey">
+	 
+<!-- Navigation Bar -->
+<div class="w3-bar w3-white w3-large">
+  	<button class="w3-bar-item w3-button w3-yellow w3-mobile" type="submit" onclick="return Index_onclick()"><i class="w3-margin-right"></i> DogOwner</button>
+    <button class="w3-bar-item w3-button w3-mobile" type="submit" onclick="return About_onclick()"><i class="w3-margin-right"></i>About Us</button>
+    <button class="w3-bar-item w3-button w3-mobile" type="submit" onclick="return Feedback_onclick()"><i class="w3-margin-right"></i>Leave Feedback</button>
+	<a  class="fa fa-times-circle-o w3-bar-item w3-button w3-right  w3-mobile" th:href="@{/logout}"></a>
+</div>
+<!-- Page Container -->
+<div class="w3-content w3-margin-top" style="max-width:1400px;">
+
+  <!-- The Grid -->
+  <div class="w3-row-padding">
+  
+    <!-- Left Column -->
+    <div class="w3-third">
+    
+      <div class="w3-white w3-text-grey w3-card-4">
+        <div class="w3-display-container">
+          <img th:src="@{/image/dog.jpg}" style="width:100%" alt="Avatar">
+          <div class="w3-display-bottomleft w3-container w3-text-black">
+            <h2 th:utext="${user.uname}">...</h2>
+          </div>
+        </div>
+     <div class="w3-container">
+          <p><i class="fa fa-briefcase fa-fw w3-margin-right w3-large w3-text-teal"></i>Customer</p>
+          <p><i class="fa fa-home fa-fw w3-margin-right w3-large w3-text-teal"></i>Address:	<t5 th:utext="${user.address}">...</t5></p>
+          <p><i class="fa fa-envelope fa-fw w3-margin-right w3-large w3-text-teal"></i>Email:	<t5 th:utext="${user.email}">...</t5></p>	
+          <p><i class="fa fa-mobile-phone fa-fw w3-margin-right w3-large w3-text-teal"></i>Phone:	<t5 th:utext="${user.phone}">...</t5></p>
+
+        </div>
+      </div><br>
+
+    <!-- End Left Column -->
+    </div>
+
+    <!-- Right Column -->
+    <div class="w3-twothird">
+    
+      <div class="w3-container w3-card w3-white w3-margin-bottom">
+        <h2 class="w3-text-grey w3-padding-16"><i class="fa fa-suitcase fa-fw w3-margin-right w3-xxlarge w3-text-teal"></i>Redistricting History</h2>
+        <div class="w3-container">
+        
+        <div class="w3-responsive" style="width:700px; height:500px;">
+  			<table class="w3-table-all">
+           <tr>
+              <th>Plan Name</th>
+              <th>Redistricting Data</th>
+              <th>Priority Factor</th>
+              <th>Created Date</th>
+           </tr>
+           <tr>
+              <td>
+                 <div class="w3-bar w3-light-grey">
+                    <button onclick="return Index_onclick()">MN State Plan 1</button>
+                 </div>
+              </td>
+              <td>
+                 <div class="w3-bar w3-light-grey">
+                    <button>Download</button>
+                 </div>
+              </td>
+              <td>
+                 <div class="w3-bar w3-light-grey">
+                  Racial Fairness
+                 </div>
+              </td>
+              <td>
+                 <div class="w3-bar w3-light-grey">
+                  11/22/2018 at 10:00
+                 </div>
+              </td>
+           </tr>
+           <tr>
+              <td>
+                 <div class="w3-bar w3-light-grey">
+                    <button onclick="return Index_onclick()">MN State Plan 2</button>
+                 </div>
+              </td>
+              <td>
+                 <div class="w3-bar w3-light-grey">
+                    <button >Download</button>
+                 </div>
+              </td>
+              <td>
+                 <div class="w3-bar w3-light-grey">
+                  Population 
+                 </div>
+              </td>
+              <td>
+                 <div class="w3-bar w3-light-grey">
+                  03/04/2018 at 13:33
+                 </div>
+              </td>
+           </tr>
+           <tr>
+              <td>
+                 <div class="w3-bar w3-light-grey">
+                    <button onclick="return Index_onclick()">MN State Plan 3</button>
+                 </div>
+              </td>
+              <td>
+                 <div class="w3-bar w3-light-grey">
+                    <button>Download</button>
+                 </div>
+              </td>
+              <td>
+                 <div class="w3-bar w3-light-grey">
+                  Compactness
+                 </div>
+              </td>
+              <td>
+                 <div class="w3-bar w3-light-grey">
+                  02/03/2018 at 14:56
+                 </div>
+              </td>
+           </tr>
+        </table>
+              </div>
+        </div>
+      </div>
+
+      
+
+    <!-- End Right Column -->
+    </div>
+    
+  <!-- End Grid -->
+  
+  <!-- Page content -->
+  <div class="w3-content" style="max-width:1532px;">
+
+ 
+
+  </div>
+
+  
+  <!-- End Page Container -->
+  </div>
+
+  <footer class="w3-padding-32 w3-black w3-center w3-margin-top">
+    <div class="w3-xlarge w3-padding-16">
+      <i class="fa fa-facebook-official w3-hover-opacity"></i>
+      <i class="fa fa-instagram w3-hover-opacity"></i>
+      <i class="fa fa-snapchat w3-hover-opacity"></i>
+      <i class="fa fa-pinterest-p w3-hover-opacity"></i>
+      <i class="fa fa-twitter w3-hover-opacity"></i>
+      <i class="fa fa-linkedin w3-hover-opacity"></i>
+    </div>
+    <p>CSE 308 2018 Spring <a href="" target="_blank" class="w3-hover-text-green">Semester Project</a></p>
+  </footer>
+
+</body>
+</html>
