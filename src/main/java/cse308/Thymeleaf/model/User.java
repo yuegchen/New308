@@ -1,6 +1,5 @@
 package cse308.Thymeleaf.model;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -16,7 +15,6 @@ public class User {
 	private	String 	email;
 	private String 	uname;
 	private String 	address;
-	@Column( length = 100000)
 	private String 	password;
 	private String 	phone;
 

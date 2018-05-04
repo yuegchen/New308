@@ -1,0 +1,11 @@
+package cse308.Thymeleaf.model;
+
+public enum Type {
+	POLYGON,
+	MULTIPOLYGON,
+	LINESTRING,
+	MULTILINESTRING,
+	POINT,
+	MULTIPOINT,
+	GEOMETRYCOLLECTION
+}
