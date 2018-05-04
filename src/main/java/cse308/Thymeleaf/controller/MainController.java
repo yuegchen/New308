@@ -1,18 +1,14 @@
 package cse308.Thymeleaf.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import cse308.Thymeleaf.form.LoginForm;
-
+import cse308.Thymeleaf.form.RedistrictingForm;
 import cse308.Thymeleaf.form.RegisterForm;
 import cse308.Thymeleaf.model.*;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -27,6 +23,8 @@ public class MainController {
 
 	@RequestMapping(value = { "/", "/index" }, method = RequestMethod.GET)
 	public String index(Model model) {
+		RedistrictingForm redistrictingForm = new RedistrictingForm();
+		model.addAttribute("redistrictingForm", redistrictingForm);
 		model.addAttribute("login", login);
 		return "index";
 	}
@@ -108,10 +106,6 @@ public class MainController {
 
 		user.setUname(uname);
 		user.setEmail(email);
-		System.out.println(pwd);
-		System.out.println(email);
-		System.out.println(uname);
-		System.out.println(address);
 		user.setPwd(Encrypt.encrypt(pwd));
 		user.setPhone(phone);
 		user.setAddress(address);
@@ -122,6 +116,7 @@ public class MainController {
 
 		entitymanager.close();
 		emfactory.close();
+		login="yes";
 		model.addAttribute("user", user);
 		return "UserCenter";
 	}

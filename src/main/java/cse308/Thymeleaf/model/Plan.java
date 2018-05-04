@@ -19,15 +19,6 @@ public class Plan {
 	private 	int 	stateId;
 	private 	State 	state;
 	private 	String 	email;
-
-	public Plan( int pid, String d, String stateName, int stateId, State s, String email) {
-		this.planId			= 	pid;
-		this.creationDate 	= 	d;
-		this.stateName 		= 	stateName;
-		this.stateId 		= 	stateId;
-		this.state			=	s;
-		this.email			=	email;
-	}
 	
 	public Plan( int pid, String d, String stateName, State state, String email) {
 		this.planId= pid;

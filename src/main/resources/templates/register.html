@@ -146,17 +146,13 @@
         }
     }
 </style>
-
 <body class="w3-light-grey">
-
     <!-- Navigation Bar -->
     <div class="w3-bar w3-white w3-large">
-
         <input type="hidden" name="login" value="-">
         <button class="w3-bar-item w3-button w3-yellow w3-mobile" type="submit" onclick="return Index_onclick()"><i class="w3-margin-right"></i> DogOwner</button>
         <button class="w3-bar-item w3-button w3-mobile" type="submit" onclick="return About_onclick()"><i class="w3-margin-right"></i>About Us</button>
         <button class="w3-bar-item w3-button w3-mobile" type="submit" onclick="return Feedback_onclick()"><i class="w3-margin-right"></i>Leave Feedback</button>
-
     </div>
     <script language="javascript" type="text/javascript">
         function Button1_onclick() {
@@ -183,7 +179,6 @@
             window.open("feedback", "_self");
         }
     </script>
-
     <!-- Page Container -->
     <div class="w3-content w3-margin-top" style="max-width:1400px;">
         <!-- The Grid -->
@@ -215,7 +210,6 @@
                                 <input type="text" placeholder="Enter Phone" name="phone" th:field="*{phone}" required>
 
                                 <p>By creating an account you agree to our <a href="#" style="color:dodgerblue">Terms & Privacy</a>.</p>
-
                                 <div class="clearfix">
                                     <button type="button" class="cancelbtn" onclick="history.back()">Cancel</button>
                                     <button type="submit" class="signupbtn" onclick="return Button1_onclick()">Sign Up</button>
@@ -238,7 +232,6 @@
             </div>
             <!-- End Grid -->
             <!-- Page content -->
-
 </body>
 <script type="text/javascript">
     $(document).ready(function() {

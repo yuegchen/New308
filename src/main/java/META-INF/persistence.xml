@@ -6,18 +6,24 @@
    http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
    
    <persistence-unit name="Eclipselink_JPA" transaction-type="RESOURCE_LOCAL">
-	  <class>cse308.Thymeleaf.model.User</class>
-	  <class>cse308.Thymeleaf.model.District</class>
-	  <class>cse308.Thymeleaf.model.State</class>
+      <class>cse308.Thymeleaf.model.User</class>
 	  <class>cse308.Thymeleaf.model.Plan</class>
+	  <class>cse308.Thymeleaf.model.State</class>
+	  <class>cse308.Thymeleaf.model.StateGeometry</class>
+	  <class>cse308.Thymeleaf.model.District</class>
 	  <class>cse308.Thymeleaf.model.Feedback</class>
+	  <class>cse308.Thymeleaf.model.Precinct</class>
+	  <class>cse308.Thymeleaf.model.PrecinctGeometry</class>
+	  <class>cse308.Thymeleaf.model.NeighborPrecinct</class>
+	  <class>cse308.Thymeleaf.model.BorderingId</class>
+	  <class>cse308.Thymeleaf.model.BorderingPrecinct</class>
       <properties>
          <property name="javax.persistence.jdbc.url" value="jdbc:mysql://mysql4.cs.stonybrook.edu:3306/yuegchen"/>
          <property name="javax.persistence.jdbc.user" value="yuegchen"/>
          <property name="javax.persistence.jdbc.password" value="110142667"/>
          <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
          <property name="eclipselink.logging.level" value="FINE"/>
-         <property name="eclipselink.ddl-generation" value="create-tables"/>
+         <property name="eclipselink.ddl-generation" value="create-or-extend-tables" />
       </properties>
       
    </persistence-unit>
