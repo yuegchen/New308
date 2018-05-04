@@ -13,8 +13,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Persistence;
 import javax.persistence.Table;
 
@@ -31,9 +29,6 @@ import cse308.Thymeleaf.model.Type;
 @Entity
 @Table(name = "DISTRICT")
 public class District {
-    EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
-    EntityManager em = emf.createEntityManager();
-
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Id
     @Column(name = "CD")
@@ -79,6 +74,8 @@ public class District {
 //  }
   
   public List <Precinct> getBorderingPrecinctList() {
+	  EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
+	  EntityManager em = emf.createEntityManager();
       List <?> borderPrecList = (List <?> ) em.createNativeQuery(
               "SELECT bp.pid FROM BORDERING_PRECINCT bp WHERE bp.DISTRICT_CD = ?")
           .setParameter(1, districtId)
@@ -115,6 +112,8 @@ public class District {
 //	}
     
     public List<Precinct> getPrecinctList(){
+    	EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
+    	EntityManager em = emf.createEntityManager();
     	List<?> precList = (List<?>) em.createQuery(
 				"SELECT p.pid FROM Precinct p WHERE p.cd = :cd")
 				.setParameter("cd", districtId)
@@ -142,6 +141,8 @@ public class District {
 	}
 	
 	public double getPerimeter() throws IOException{
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
+		EntityManager em = emf.createEntityManager();
 		double districtPerimeter = 0.0;
 		GeometryJSON			geometryJson	=	new GeometryJSON();
 		GeometryPrecisionReducer gpr			=	new GeometryPrecisionReducer(new PrecisionModel(100));

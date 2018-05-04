@@ -25,6 +25,7 @@ public class RedistrictingController {
 	@RequestMapping(value = { "/redistrict" }, method = RequestMethod.POST)
 	public String startAlgo(Model model, //
 			@ModelAttribute("redistrictingForm") RedistrictingForm redistrictingForm) throws IOException {
+		
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("Eclipselink_JPA");
 		EntityManager entitymanager = emfactory.createEntityManager();
 		state = entitymanager.find(State.class, 27);

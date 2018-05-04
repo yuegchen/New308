@@ -13,7 +13,6 @@ import javax.persistence.Table;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 
 import org.geotools.geojson.geom.GeometryJSON;
 
@@ -22,23 +21,18 @@ import com.vividsolutions.jts.geom.Polygon;
 @Entity
 @Table
 public class State {
-	EntityManagerFactory	emf				=	Persistence.createEntityManagerFactory("Eclipselink_JPA");
-	EntityManager			em				=	emf.createEntityManager();
-	
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Id
 	private 	int 		stateId;
 	private 	String 		stateName;
-	private 	District[] 	dList;
 
 	private 	List<District> 		districtList;
 	
 	public 		static		final		int		MAX_STATE_ID_INITIAL = 999999999;
 	
-	public State( int sid, String stateName, District[] dl) {
+	public State( int sid, String stateName) {
 		this.stateId		= 	sid;
 		this.stateName 		= 	stateName;
-		this.dList			=	dl;
 	}
 	//Test Use
 	public State(int stateId){
@@ -47,14 +41,6 @@ public class State {
 	
 	public State() {
 		super();
-	}
-
-	public District[] getDList() {
-		return dList;
-	}
-
-	public void setDList(District[] dList) {
-		this.dList = dList;
 	}
 	
 	public String getStateName() {
@@ -66,6 +52,8 @@ public class State {
 	}
 
 	public void initializeNeighborPrecincts() throws IOException{
+		EntityManagerFactory	emf				=	Persistence.createEntityManagerFactory("Eclipselink_JPA");
+		EntityManager			em				=	emf.createEntityManager();
 		List<?>					precinctIds		=	(List<?>) em.createQuery("SELECT pg.pid FROM PrecinctGeometry pg").getResultList();
 		GeometryJSON			geometryJson	=	new GeometryJSON();
 		List<PrecinctGeometry>	precinctGeometries=	new ArrayList<PrecinctGeometry>();
@@ -99,6 +87,8 @@ public class State {
 	}
 	
 	public void initializeBorderPrecincts() throws IOException {
+		EntityManagerFactory	emf				=	Persistence.createEntityManagerFactory("Eclipselink_JPA");
+		EntityManager			em				=	emf.createEntityManager();
 		List<?>				districtBorderPrecinctIds		=	(List<?>) em.createQuery(
 				"SELECT p1.pid FROM Precinct p1, Precinct p2, NeighborPrecinct np WHERE (p1.pid = np.precinct.pid) AND (p2.pid = np.nid AND p1.cd != p2.cd)").getResultList();
 		List<?> 			stateBorderPrecinctIds			=	(List<?>) em.createQuery(
@@ -144,17 +134,19 @@ public class State {
 //		return districtList;
 //	}
 
-    public List<District> getDistList(){
-    	List<?> distList = (List<?>) em.createQuery(
-				"SELECT d.cd FROM District WHERE d.stateid = :sid")
-				.setParameter("sid", stateId)
-				.getResultList();
-    	for(int i = 0; i < distList.size(); i++){
-    		District district = em.find(District.class, (int)distList.get(i));
-    		districtList.add(district);
-    	}
-    	return districtList;
-    }
+	 public List <District> getDistList() {
+	        EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
+	        EntityManager em = emf.createEntityManager();
+	        List <?> distList = (List <?> ) em.createQuery(
+	                "SELECT d.districtId FROM District d WHERE d.stateId = :sid")
+	            .setParameter("sid", stateId)
+	            .getResultList();
+	        for (int i = 0; i < distList.size(); i++) {
+	            District district = em.find(District.class, (int) distList.get(i));
+	            districtList.add(district);
+	        }
+	        return districtList;
+	    }
     
     public void setDistList(List<District> distList){
     	this.districtList=distList;
