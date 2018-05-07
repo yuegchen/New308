@@ -32,11 +32,11 @@ public class NeighborPrecinct {
 		
 	}
 	
-	public int getId(){
+	public int getNid(){
 		return nid;
 	}
 	
-	public void setId(int nid){
+	public void setNid(int nid){
 		this.nid = nid;
 	}
 	

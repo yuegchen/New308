@@ -39,7 +39,7 @@ public class MainController {
 	}
 
 	@RequestMapping(value = { "/login" }, method = RequestMethod.POST)
-	public String login(Model model, //
+	public String login(Model model, 
 			@ModelAttribute("loginForm") LoginForm loginForm) {
 
 		String email = loginForm.getEmail();
@@ -91,7 +91,7 @@ public class MainController {
 	}
 
 	@RequestMapping(value = { "/register" }, method = RequestMethod.POST)
-	public String register(Model model, //
+	public String register(Model model, 
 			@ModelAttribute("registerForm") RegisterForm registerForm) {
 
 		String email = registerForm.getEmail();

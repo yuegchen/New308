@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.Query;
 import javax.persistence.Table;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -26,7 +27,7 @@ public class State {
 	private 	int 		stateId;
 	private 	String 		stateName;
 
-	private 	List<District> 		districtList;
+	private 	List<District> 		districtList = new ArrayList<District>(); 
 	
 	public 		static		final		int		MAX_STATE_ID_INITIAL = 999999999;
 	
@@ -37,6 +38,8 @@ public class State {
 	//Test Use
 	public State(int stateId){
 		this.stateId = stateId;
+		this.districtList = initDistList();
+		
 	}
 	
 	public State() {
@@ -51,7 +54,7 @@ public class State {
 		this.stateName= s;
 	}
 
-	public void initializeNeighborPrecincts() throws IOException{
+	public void initiNeighborPrecincts() throws IOException{
 		EntityManagerFactory	emf				=	Persistence.createEntityManagerFactory("Eclipselink_JPA");
 		EntityManager			em				=	emf.createEntityManager();
 		List<?>					precinctIds		=	(List<?>) em.createQuery("SELECT pg.pid FROM PrecinctGeometry pg").getResultList();
@@ -61,13 +64,11 @@ public class State {
 		
 		// 27 is hard-coded, will be changed later
 		Polygon					statePolygon	=	StateGeometry.getStateGeometry(em.find(StateGeometry.class, stateId), geometryJson);
-		
 		for(int i = 0; i < precinctIds.size(); i++)
 		{
 			precinctGeometries.add(em.find(PrecinctGeometry.class, (int)precinctIds.get(i))); 
 			precincts.add(em.find(Precinct.class, (int)precinctIds.get(i)));
 		}
-		
 		for(int i = 0; i < precinctIds.size(); i++){
 			em.getTransaction().begin();
 			for(int neighborI = 0; neighborI < precinctIds.size(); neighborI++){
@@ -86,27 +87,45 @@ public class State {
 		em.close();
 	}
 	
-	public void initializeBorderPrecincts() throws IOException {
+	public void initiBorderingPrecincts() throws IOException {
 		EntityManagerFactory	emf				=	Persistence.createEntityManagerFactory("Eclipselink_JPA");
 		EntityManager			em				=	emf.createEntityManager();
 		List<?>				districtBorderPrecinctIds		=	(List<?>) em.createQuery(
-				"SELECT p1.pid FROM Precinct p1, Precinct p2, NeighborPrecinct np WHERE (p1.pid = np.precinct.pid) AND (p2.pid = np.nid AND p1.cd != p2.cd)").getResultList();
+				"SELECT p1.pid, p2.pid FROM Precinct p1, Precinct p2, NeighborPrecinct np WHERE (p1.pid = np.precinct.pid) AND (p2.pid = np.nid"
+				+	"AND p1.cd != p2.cd)").getResultList();
 		List<?> 			stateBorderPrecinctIds			=	(List<?>) em.createQuery(
 				"SELECT p.pid FROM Precinct p, NeighborPrecinct np WHERE (p.pid = np.precinct.pid) AND (np.nid = :stateId)").
 				setParameter("stateId", MAX_STATE_ID_INITIAL-stateId).getResultList();
 	 
 		List<Integer>	storedPrecinctIdList	=	new ArrayList<Integer>();
+		handleDistrictBorderingPrecincts(districtBorderPrecinctIds, em, storedPrecinctIdList);
+		handleStateBorderingPrecincts(stateBorderPrecinctIds, em, storedPrecinctIdList);
+		em.close();
+	}
+	
+	public void handleDistrictBorderingPrecincts(List<?> districtBorderPrecinctIds, EntityManager em, List<Integer> storedPrecinctIdList) 
+			throws IOException{
+		List<String>	storedBorderIdList		=	new ArrayList<String>();
 		em.getTransaction().begin();
 		for(int i = 0; i < districtBorderPrecinctIds.size(); i++){
-			Precinct precinct = em.find(Precinct.class, (int)districtBorderPrecinctIds.get(i));
+			Precinct precinct = em.find(Precinct.class, (int)((Object[])districtBorderPrecinctIds.get(i))[0]);
+			Precinct nPrecInNDistrict = em.find(Precinct.class, (int)((Object[])districtBorderPrecinctIds.get(i))[1]);
 			District district = em.find(District.class, precinct.getCd());
 			if(storedPrecinctIdList.indexOf(precinct.getPid()) == -1){
 				storedPrecinctIdList.add(precinct.getPid());
 				em.persist(new BorderingPrecinct(precinct, district));
 			}
+			String storedBorderIds = Integer.toString(nPrecInNDistrict.getCd()) + " " + Integer.toString(district.getDId());
+			if(storedBorderIdList.indexOf(storedBorderIds) == -1){
+				storedBorderIdList.add(storedBorderIds);
+				em.persist(new NeighborDistrict(nPrecInNDistrict.getCd(), district));
+			}
 		}
 		em.getTransaction().commit();
-		
+	}
+	
+	public void handleStateBorderingPrecincts(List<?> stateBorderPrecinctIds, EntityManager em, List<Integer> storedPrecinctIdList) 
+			throws IOException{
 		em.getTransaction().begin();
 		for(int i = 0; i < stateBorderPrecinctIds.size(); i++){
 			
@@ -117,15 +136,14 @@ public class State {
 			}
 		}
 		em.getTransaction().commit();
-		em.close();
-	}
+	} 
 	
 	public int getStateId() {
 		return stateId;
 	}
 
 	public void setStateId(int id) {
-		this.stateId= id;
+		this.stateId= id; 
 	}
 		
 //	@OneToMany(mappedBy = "state", cascade = CascadeType.ALL)
@@ -134,20 +152,26 @@ public class State {
 //		return districtList;
 //	}
 
-	 public List <District> getDistList() {
+	 public List <District> initDistList() { 
 	        EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
 	        EntityManager em = emf.createEntityManager();
-	        List <?> distList = (List <?> ) em.createQuery(
-	                "SELECT d.districtId FROM District d WHERE d.stateId = :sid")
-	            .setParameter("sid", stateId)
+	        
+	        List <?> distIdList = (List <?>) em.createNativeQuery(
+	                "SELECT d.cd FROM DISTRICT d WHERE d.stateid = ?1")
+	            .setParameter(1, this.stateId)
 	            .getResultList();
-	        for (int i = 0; i < distList.size(); i++) {
-	            District district = em.find(District.class, (int) distList.get(i));
-	            districtList.add(district);
+	        
+	        List <District> distList = new ArrayList<District>();
+	        for (int i = 0; i < distIdList.size(); i++) {
+	        	distList.add(em.find(District.class, (int) distIdList.get(i)));
 	        }
-	        return districtList;
+	        
+	        return distList;
 	    }
     
+	public List<District> getDistList(){
+		return districtList;
+	}
     public void setDistList(List<District> distList){
     	this.districtList=distList;
     }

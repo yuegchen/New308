@@ -50,6 +50,8 @@ public class District {
 
     public District(int districtId) {
         this.districtId = districtId;
+        this.precinctList = initPrecList();
+        this.borderingPrecinctList = initBorderingPrecinctList();
     }
 
     public District() {
@@ -64,8 +66,20 @@ public class District {
 		this.movedIntoPrecinctList=pList;
 	}
 	
-	public District[] getNeighborDistricts(){
-		return null;
+	public List<District> getNeighborDistricts(){
+	  EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
+	  EntityManager em = emf.createEntityManager();
+      List <?> nDistIdList = (List <?> ) em.createNativeQuery(
+    		  "SELECT nd.NDISTRICTID FROM NEIGHBOR_DISTRICT nd WHERE nd.DISTRICT_DISTRICTID = ?")
+          .setParameter(1, districtId)
+          .getResultList();
+      
+      List <District> nDistList = new ArrayList<District>();
+      for (int i = 0; i < nDistIdList.size(); i++) {
+          District precinct = em.find(District.class, (int) nDistIdList.get(i));
+          nDistList.add(precinct);
+      }
+      return nDistList;
 	}
 	
 //  @OneToMany(mappedBy = "district", cascade = CascadeType.ALL)
@@ -73,21 +87,27 @@ public class District {
 //      return borderingPrecinctList;
 //  }
   
-  public List <Precinct> getBorderingPrecinctList() {
+  public List <Precinct> initBorderingPrecinctList() {
 	  EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
 	  EntityManager em = emf.createEntityManager();
-      List <?> borderPrecList = (List <?> ) em.createNativeQuery(
+      List <?> borderPrecIdList = (List <?> ) em.createNativeQuery(
               "SELECT bp.pid FROM BORDERING_PRECINCT bp WHERE bp.DISTRICT_CD = ?")
           .setParameter(1, districtId)
           .getResultList();
-      for (int i = 0; i < borderPrecList.size(); i++) {
-          Precinct precinct = em.find(Precinct.class, (int) borderPrecList.get(i));
-          borderingPrecinctList.add(precinct);
+      
+      List <Precinct> borderPrecList = new ArrayList<Precinct>();
+      for (int i = 0; i < borderPrecIdList.size(); i++) {
+          Precinct precinct = em.find(Precinct.class, (int) borderPrecIdList.get(i));
+          borderPrecList.add(precinct);
       }
-      return borderingPrecinctList;
+      return borderPrecList;
   }
   
-  public void setBorderPrecinctList(List<Precinct> bPrecinctList){
+  public List<Precinct> getBorderingPrecinctList(){
+	  return borderingPrecinctList;
+  }
+  
+  public void setBorderingPrecinctList(List<Precinct> bPrecinctList){
   	this.borderingPrecinctList = bPrecinctList;
   }
 
@@ -98,30 +118,23 @@ public class District {
 	public void setDId(int id) {
 		this.districtId= id;
 	}
-	
-//    @ManyToOne
-//    @JoinColumn(name = "STATEID")
-//	public State getState(){
-//		return state;
-//	}
     
-//	@OneToMany(targetEntity=Precinct.class, mappedBy = "district", cascade = CascadeType.ALL)
-//	@JoinColumn(name = "CD")
-//	public List<Precinct> getPrecinctList(){
-//		return precinctList;
-//	}
-    
-    public List<Precinct> getPrecinctList(){
+    public List<Precinct> initPrecList(){
     	EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
     	EntityManager em = emf.createEntityManager();
-    	List<?> precList = (List<?>) em.createQuery(
+    	List<?> precIdList = (List<?>) em.createQuery(
 				"SELECT p.pid FROM Precinct p WHERE p.cd = :cd")
 				.setParameter("cd", districtId)
 				.getResultList();
-    	for(int i = 0; i < precList.size(); i++){
-    		Precinct precinct = em.find(Precinct.class, (int)precList.get(i));
-    		precinctList.add(precinct);
+    	List<Precinct> precList = new ArrayList<Precinct>();
+    	for(int i = 0; i < precIdList.size(); i++){
+    		Precinct precinct = em.find(Precinct.class, (int)precIdList.get(i));
+    		precList.add(precinct);
     	}
+    	return precList;
+    }
+    
+    public List<Precinct> getPrecinctList(){
     	return precinctList;
     }
     

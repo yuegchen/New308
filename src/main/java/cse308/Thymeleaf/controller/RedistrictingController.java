@@ -29,12 +29,13 @@ public class RedistrictingController {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("Eclipselink_JPA");
 		EntityManager entitymanager = emfactory.createEntityManager();
 		state = entitymanager.find(State.class, 27);
+		System.out.println(state.getStateId());
 		
-		List<District> dList = state.getDistList();
+		List<District> dList = state.initDistList();
 		
 		for(District d:dList){
-			List<Precinct> borderPrecinctList = d.getBorderingPrecinctList();
-			District[] neighborDistrictList = d.getNeighborDistricts();
+			List<Precinct> borderPrecinctList = d.initBorderingPrecinctList();
+			List<District> neighborDistrictList = d.getNeighborDistricts();
 			for(District to:neighborDistrictList){
 				tryMove(borderPrecinctList,d,to);
 			}
@@ -69,11 +70,11 @@ public class RedistrictingController {
 		double contiguity = calculateContiguity(d, weights[3]);
 		double racialFairness = calculateRacialFairness(d, weights[4]);
 		double totalGoodness = compactness + population + politicalFairness + contiguity + racialFairness;
-		return totalGoodness;
+		return totalGoodness; 
 	}
 
 	public boolean checkConstraint(Precinct precinct, District d2) {
-		District[] neighborDistrictList = d2.getNeighborDistricts();
+		List<District> neighborDistrictList = d2.getNeighborDistricts();
 		for (District d : neighborDistrictList) {
 			if (Arrays.asList(d.getBorderingPrecinctList()).contains(precinct)) {
 				return true;
@@ -89,7 +90,7 @@ public class RedistrictingController {
 		
 		List<Precinct> borderingPrecinctList = d1.getBorderingPrecinctList();
 		borderingPrecinctList.remove(precinct);
-		d1.setBorderPrecinctList(borderingPrecinctList);
+		d1.setBorderingPrecinctList(borderingPrecinctList);
 		
 		List<Precinct> precinctList2 = d2.getPrecinctList();
 		precinctList2.add(precinct);
@@ -97,7 +98,7 @@ public class RedistrictingController {
 		
 		List<Precinct> borderingPrecinctList2 = d2.getBorderingPrecinctList();
 		borderingPrecinctList2.remove(precinct);
-		d2.setBorderPrecinctList(borderingPrecinctList2);
+		d2.setBorderingPrecinctList(borderingPrecinctList2);
 		
 		if(!out){
 			List<Integer> intoPList = d2.getIntoPList();

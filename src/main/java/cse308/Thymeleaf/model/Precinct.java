@@ -77,7 +77,6 @@ public class Precinct {
 //	}
 //	
 	
-
 	public double getArea() throws IOException{
 		double area;
 		EntityManagerFactory	emf				=	Persistence.createEntityManagerFactory("Eclipselink_JPA");
