@@ -92,7 +92,7 @@ public class State {
 		EntityManager			em				=	emf.createEntityManager();
 		List<?>				districtBorderPrecinctIds		=	(List<?>) em.createQuery(
 				"SELECT p1.pid, p2.pid FROM Precinct p1, Precinct p2, NeighborPrecinct np WHERE (p1.pid = np.precinct.pid) AND (p2.pid = np.nid"
-				+	"AND p1.cd != p2.cd)").getResultList();
+				+	" AND p1.cd != p2.cd)").getResultList();
 		List<?> 			stateBorderPrecinctIds			=	(List<?>) em.createQuery(
 				"SELECT p.pid FROM Precinct p, NeighborPrecinct np WHERE (p.pid = np.precinct.pid) AND (np.nid = :stateId)").
 				setParameter("stateId", MAX_STATE_ID_INITIAL-stateId).getResultList();

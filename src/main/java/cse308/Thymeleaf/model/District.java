@@ -70,7 +70,7 @@ public class District {
 	  EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
 	  EntityManager em = emf.createEntityManager();
       List <?> nDistIdList = (List <?> ) em.createNativeQuery(
-    		  "SELECT nd.NDISTRICTID FROM NEIGHBOR_DISTRICT nd WHERE nd.DISTRICT_DISTRICTID = ?")
+    		  "SELECT nd.NDISTRICTID FROM NEIGHBOR_DISTRICT nd WHERE nd.DISTRICT_CD = ?")
           .setParameter(1, districtId)
           .getResultList();
       

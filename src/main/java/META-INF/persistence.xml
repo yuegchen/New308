@@ -14,6 +14,7 @@
 	  <class>cse308.Thymeleaf.model.Feedback</class>
 	  <class>cse308.Thymeleaf.model.Precinct</class>
 	  <class>cse308.Thymeleaf.model.PrecinctGeometry</class>
+	  <class>cse308.Thymeleaf.model.NeighborDistrict</class>
 	  <class>cse308.Thymeleaf.model.NeighborPrecinct</class>
 	  <class>cse308.Thymeleaf.model.BorderingId</class>
 	  <class>cse308.Thymeleaf.model.BorderingPrecinct</class>
