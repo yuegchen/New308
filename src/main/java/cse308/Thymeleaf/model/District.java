@@ -119,7 +119,7 @@ public class District {
 		this.districtId= id;
 	}
     
-    public List<Precinct> initPrecList(){
+	public List<Precinct> initPrecList(){
     	EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
     	EntityManager em = emf.createEntityManager();
     	List<?> precIdList = (List<?>) em.createQuery(
@@ -144,9 +144,9 @@ public class District {
 	
 	public double getArea() throws IOException{
 		double districtArea = 0.0;
-		System.out.println(getPrecinctList().size());
+//		System.out.println(getPrecinctList().size());
 		
-		for(Precinct precinct: getPrecinctList()){
+		for(Precinct precinct: initPrecList()){
 			System.err.println("tried__________________________");
 			districtArea += precinct.getArea();
 		}

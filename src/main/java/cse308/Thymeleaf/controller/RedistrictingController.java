@@ -6,12 +6,14 @@ import java.util.*;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
 
 import cse308.Thymeleaf.form.RedistrictingForm;
 import cse308.Thymeleaf.form.RegisterForm;
@@ -20,7 +22,8 @@ import cse308.Thymeleaf.model.*;
 @Controller
 public class RedistrictingController {
 	private static State state;
-	private static double[] weights;
+	private static double[] weights={1,0,0,0,0};
+	private static String move="";
 
 	@RequestMapping(value = { "/redistrict" }, method = RequestMethod.POST)
 	public String startAlgo(Model model, //
@@ -106,14 +109,15 @@ public class RedistrictingController {
 			d2.setIntoPList(intoPList);
 		}
 		else{
-			List<Integer> intoPList = d2.getIntoPList();
+			List<Integer> intoPList = d1.getIntoPList();
 			intoPList.remove(precinct.getPid());
-			d2.setIntoPList(intoPList);
+			d1.setIntoPList(intoPList);
 		}
+		move="{ \"movedPrecincts\" : [[ 'districtId': '"+d2.getDId()+"', \"precinctId\": ["+precinct.getPid()+"]]]}";
 		System.out.println("move "+precinct.getPid()+" from "+d1.getDId()+" to "+d2.getDId());
 		
 	}
-
+	
 	public double calculateCompactness(District d, double weight) throws IOException {
 		double perimeter = d.getPerimeter();
 		double area = d.getArea();
