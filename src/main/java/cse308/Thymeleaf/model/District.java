@@ -147,7 +147,7 @@ public class District {
 //		System.out.println(getPrecinctList().size());
 		
 		for(Precinct precinct: initPrecList()){
-			System.err.println("tried__________________________");
+//			System.err.println("tried__________________________");
 			districtArea += precinct.getArea();
 		}
 		return districtArea;
@@ -158,7 +158,7 @@ public class District {
 		EntityManager em = emf.createEntityManager();
 		double districtPerimeter = 0.0;
 		GeometryJSON			geometryJson	=	new GeometryJSON();
-		GeometryPrecisionReducer gpr			=	new GeometryPrecisionReducer(new PrecisionModel(100));
+		GeometryPrecisionReducer gpr			=	new GeometryPrecisionReducer(new PrecisionModel(10));
 		
 		List<?>				districtBorderPrecinctIds		=	(List<?>) em.createQuery(
 				"SELECT p1.pid, p2.pid FROM Precinct p1, Precinct p2, NeighborPrecinct np WHERE (p1.pid = np.precinct.pid) AND (p2.pid = " + 

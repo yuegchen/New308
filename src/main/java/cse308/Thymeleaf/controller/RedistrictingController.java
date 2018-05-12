@@ -28,11 +28,11 @@ public class RedistrictingController {
 	@RequestMapping(value = { "/redistrict" }, method = RequestMethod.POST)
 	public String startAlgo(Model model, //
 			@ModelAttribute("redistrictingForm") RedistrictingForm redistrictingForm) throws IOException {
-		
+		System.err.println("Enter startAlgo!!!");
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("Eclipselink_JPA");
 		EntityManager entitymanager = emfactory.createEntityManager();
 		state = entitymanager.find(State.class, 27);
-		System.out.println(state.getStateId());
+		System.err.println("State Id"+state.getStateId());
 		
 		List<District> dList = state.initDistList();
 		
@@ -51,6 +51,7 @@ public class RedistrictingController {
 	}
 
 	private void tryMove(List<Precinct> borderPrecinctList,District from, District to) throws IOException {
+		System.err.println("Enter tryMove!!!");
 		double originalScore=calculateGoodness(from)+calculateGoodness(to);
 		for (Precinct precinct : borderPrecinctList) {
 			if(checkConstraint(precinct,to))
@@ -67,6 +68,7 @@ public class RedistrictingController {
 	}
 	
 	public double calculateGoodness(District d) throws IOException {
+		System.err.println("Enter calculateGoodness!!!");
 		double compactness = calculateCompactness(d, weights[0]);
 		double population = calculatePopulation(d, weights[1]);
 		double politicalFairness = calculatePoliticalFairness(d, weights[2]);
@@ -77,6 +79,7 @@ public class RedistrictingController {
 	}
 
 	public boolean checkConstraint(Precinct precinct, District d2) {
+		System.err.println("Enter Chenck Constraint!!!");
 		List<District> neighborDistrictList = d2.getNeighborDistricts();
 		for (District d : neighborDistrictList) {
 			if (Arrays.asList(d.getBorderingPrecinctList()).contains(precinct)) {
@@ -87,6 +90,7 @@ public class RedistrictingController {
 	}
 
 	public void moveTo(Precinct precinct, District d1, District d2, boolean out) {
+		System.err.println("Enter moveTo!!!");
 		List<Precinct> precinctList = d1.getPrecinctList();
 		precinctList.remove(precinct);
 		d1.setPrecinctList(precinctList); 
@@ -114,13 +118,18 @@ public class RedistrictingController {
 			d1.setIntoPList(intoPList);
 		}
 		move="{ \"movedPrecincts\" : [[ 'districtId': '"+d2.getDId()+"', \"precinctId\": ["+precinct.getPid()+"]]]}";
-		System.out.println("move "+precinct.getPid()+" from "+d1.getDId()+" to "+d2.getDId());
+		System.err.println("move "+precinct.getPid()+" from "+d1.getDId()+" to "+d2.getDId());
 		
 	}
 	
 	public double calculateCompactness(District d, double weight) throws IOException {
+		System.err.println("Enter calculateCompactness!!!");
+		System.err.println("try get Perimeter!!!");
 		double perimeter = d.getPerimeter();
+		System.err.println("I get Perimeter!!!");
+		System.err.println("try get Area!!!");
 		double area = d.getArea();
+		System.err.println("I get Area!!!");
 		double r = Math.sqrt(area / Math.PI);
 		double equalAreaPerimeter = 2 * Math.PI * r;
 		double score = 1 / (perimeter / equalAreaPerimeter);
