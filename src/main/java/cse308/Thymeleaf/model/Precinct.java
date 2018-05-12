@@ -1,9 +1,11 @@
 package cse308.Thymeleaf.model;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -15,6 +17,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Persistence;
+import javax.persistence.Query;
 import javax.persistence.Table;
 
 import org.geotools.geojson.geom.GeometryJSON;
@@ -28,7 +31,8 @@ public class Precinct {
 	private 	int 		pid;
 	private 	String 		name;
 	private 	int 	cd;
-	private		int		area;
+	
+	private		double		area;
 	
 //	private		District	district;
 	private List<NeighborPrecinct> neighborPrecincts;
@@ -76,21 +80,50 @@ public class Precinct {
 //		return district;
 //	}
 //	
+	@Column(name="AREA")
+	public void setArea(double area){
+		this.area = area;
+	}
 	
-	public double getArea() throws IOException{
-		double area;
+	public double getArea(){
+		return area;
+	}
+	
+	public double initArea() throws IOException{
+		double tempArea = 0;
 		EntityManagerFactory	emf				=	Persistence.createEntityManagerFactory("Eclipselink_JPA");
 		EntityManager			em				=	emf.createEntityManager();
 		GeometryJSON			geometryJson	=	new GeometryJSON();
-		area = PrecinctGeometry.getPrecinctGeometries(em.find(PrecinctGeometry.class, pid), geometryJson).getArea();
+		tempArea = PrecinctGeometry.getPrecinctGeometries(em.find(PrecinctGeometry.class, pid), geometryJson).getArea();
+		em.getTransaction().begin();
+		Query query = em
+				.createQuery("UPDATE Precinct p SET p.area = :tempArea "
+				+ "WHERE p.pid= :pid");
+		query.setParameter("tempArea", tempArea);
+		query.setParameter("pid", pid);
+		query.executeUpdate();
+		em.getTransaction().commit();
 		em.close();
-		return area;
+		
+		return tempArea;
 	}
 
 //	@OneToMany(mappedBy = "precinct", cascade = CascadeType.ALL)
-	public List<NeighborPrecinct> getNeighborPrecinctList(){
-		return neighborPrecincts;
-	}
+	public List<Precinct> getNeighborPrecinctList(){
+		  EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
+		  EntityManager em = emf.createEntityManager();
+	      List <?> nPrecIdList = (List <?> ) em.createNativeQuery(
+	    		  "SELECT np.NID FROM NEIGHBOR_PRECINCT np WHERE np.PRECINCT_PID = ?")
+	          .setParameter(1, pid)
+	          .getResultList();
+	      
+	      List <Precinct> nPrecList = new ArrayList<Precinct>();
+	      for (int i = 0; i < nPrecIdList.size(); i++) {
+	          Precinct precinct = em.find(Precinct.class, (int) nPrecIdList.get(i));
+	          nPrecList.add(precinct);
+	      }
+	      return nPrecList;
+		}
 	
 	public void setNeighborPrecinctList(List<NeighborPrecinct> neighborPrecincts){
 		this.neighborPrecincts = neighborPrecincts;

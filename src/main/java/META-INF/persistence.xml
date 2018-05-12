@@ -24,7 +24,7 @@
          <property name="javax.persistence.jdbc.user" value="yuegchen"/>
          <property name="javax.persistence.jdbc.password" value="110142667"/>
          <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
-         <property name="eclipselink.logging.level" value="FINE"/>
+         <property name="eclipselink.logging.level" value="OFF"/>
          <property name="eclipselink.ddl-generation" value="create-or-extend-tables" />
       </properties>
       

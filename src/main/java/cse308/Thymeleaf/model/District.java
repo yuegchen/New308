@@ -34,7 +34,7 @@ public class District {
     @Column(name = "CD")
     private int districtId;
 
-    private List<Integer> movedIntoPrecinctList; //store precincts with their id
+    private List<Integer> movedIntoPrecinctList= new ArrayList <Integer>(); //store precincts with their id
 
     private List <Precinct> borderingPrecinctList = new ArrayList <Precinct>();;
     
@@ -76,6 +76,7 @@ public class District {
       
       List <District> nDistList = new ArrayList<District>();
       for (int i = 0; i < nDistIdList.size(); i++) {
+    	  System.out.println("N Dist Id: " + nDistIdList.get(i));
           District precinct = em.find(District.class, (int) nDistIdList.get(i));
           nDistList.add(precinct);
       }
@@ -147,7 +148,6 @@ public class District {
 //		System.out.println(getPrecinctList().size());
 		
 		for(Precinct precinct: initPrecList()){
-			System.err.println("tried__________________________");
 			districtArea += precinct.getArea();
 		}
 		return districtArea;
@@ -158,8 +158,8 @@ public class District {
 		EntityManager em = emf.createEntityManager();
 		double districtPerimeter = 0.0;
 		GeometryJSON			geometryJson	=	new GeometryJSON();
-		GeometryPrecisionReducer gpr			=	new GeometryPrecisionReducer(new PrecisionModel(100));
-		
+		GeometryPrecisionReducer gpr			=	new GeometryPrecisionReducer(new PrecisionModel(10));
+
 		List<?>				districtBorderPrecinctIds		=	(List<?>) em.createQuery(
 				"SELECT p1.pid, p2.pid FROM Precinct p1, Precinct p2, NeighborPrecinct np WHERE (p1.pid = np.precinct.pid) AND (p2.pid = " + 
 				"np.nid AND p1.cd != p2.cd) AND (p1.cd = :cd)").setParameter("cd", districtId).getResultList();
