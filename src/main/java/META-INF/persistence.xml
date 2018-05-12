@@ -7,6 +7,7 @@
    
    <persistence-unit name="Eclipselink_JPA" transaction-type="RESOURCE_LOCAL">
       <class>cse308.Thymeleaf.model.User</class>
+      <class>cse308.Thymeleaf.model.Admin</class>
 	  <class>cse308.Thymeleaf.model.Plan</class>
 	  <class>cse308.Thymeleaf.model.State</class>
 	  <class>cse308.Thymeleaf.model.StateGeometry</class>

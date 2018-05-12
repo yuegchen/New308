@@ -37,67 +37,111 @@
    </script>
    <body>
    	<div class="w3-bar w3-white w3-large">
-            <button class="w3-bar-item w3-button w3-yellow w3-mobile" type="submit"><i class="w3-margin-right"></i> DogOwners</button>
-            <button class="w3-bar-item w3-button w3-mobile" type="submit" onclick="return About_onclick()"><i class="w3-margin-right"></i>About Us</button>
-            <button class="w3-bar-item w3-button w3-mobile" type="submit" onclick="return Feedback_onclick()"><i class="w3-margin-right"></i>Leave Feedback</button>
-            <form action="index" >
-               <input type="hidden" name="login" value="-">
-               <button class="fa fa-times-circle-o w3-bar-item w3-button w3-right  w3-mobile" type="submit" ><i class="w3-margin-right"></i> </button>
-            </form>
+            <button class="w3-bar-item w3-button w3-yellow w3-mobile" type="submit" ><i class="w3-margin-right"></i> DogOwners</button>
+            <a  class="fa fa-times-circle-o w3-bar-item w3-button w3-right  w3-mobile" th:href="@{/logout}"></a>
       </div>
    	<div class="box">
    		<!-- Start Left Column -->
          <div class="w3-third">
             <div class="w3-white w3-text-grey w3-card-4">
                <div class="w3-display-container">
-                  <img src="dog.jpg" style="width:100%" alt="Avatar">
+                  <img th:src="@{/image/dog.jpg}" style="width:100%" alt="Avatar">
                   <div class="w3-display-topleft w3-container w3-text-white">
-                     <h2>Cheng Ji</h2>
+                      <h2 th:utext="${admin.uname}">...</h2>
                   </div>
                   <div class="w3-container">
-                     <p><i class="fa fa-id-card-o fa-fw w3-margin-right w3-large w3-text-teal"></i>ID</p >
-                     <p><i class="fa fa-home fa-fw w3-margin-right w3-large w3-text-teal"></i>Address</p >
-                     <p><i class="fa fa-envelope fa-fw w3-margin-right w3-large w3-text-teal"></i>Email</p > 
-                     <p><i class="fa fa-mobile-phone fa-fw w3-margin-right w3-large w3-text-teal"></i>Phone</p >
+                          <p><i class="fa fa-briefcase fa-fw w3-margin-right w3-large w3-text-teal"></i>Administer</p>
+          <p><i class="fa fa-home fa-fw w3-margin-right w3-large w3-text-teal"></i>Address:	<t5 th:utext="${admin.address}">...</t5></p>
+          <p><i class="fa fa-envelope fa-fw w3-margin-right w3-large w3-text-teal"></i>Email:	<t5 th:utext="${admin.email}">...</t5></p>	
+          <p><i class="fa fa-mobile-phone fa-fw w3-margin-right w3-large w3-text-teal"></i>Phone:	<t5 th:utext="${admin.phone}">...</t5></p>
                   </div>
                </div> 
             </div><br>
          </div>
          <!-- End Left Column -->
          <!-- Start Right Column -->
-         <div class="w3-twothird">
+         
+          <div class="w3-twothird">
             <div class="w3-container w3-card w3-white w3-margin-bottom">
-               <h2 class="w3-text-grey w3-padding-16"><i class="fa fa-suitcase fa-fw w3-margin-right w3-xxlarge w3-text-teal"></i>Edit User Information</h2>
+               <h2 class="w3-text-grey w3-padding-16"><i class="fa fa-suitcase fa-fw w3-margin-right w3-xxlarge w3-text-teal"></i>Edit Admin Information</h2>
+               <a  class=" w3-bar-item w3-button w3-mobile" th:href="@{/addAdmin}">add a new admin</a>
                <div class="w3-container">
-                  <button class="w3-button w3-dark-grey" type="button" name="back" onclick="history.back()">Back</button>
                   <div class="w3-responsive" style=" height:300px;overflow:auto;">
                      <table class="w3-table-all">
                         <tr>
-                           <th></th>
-                           <th>Id(Account Number)</th>
-                           <th>First Name</th>
-                           <th>Last Name</th>
-                           
-                           <th>Phone</th>
                            <th>Email</th>
+                           <th>Name</th>
+                           <th>Address</th>
+                           <th>Phone</th>
                         </tr>
+                        <tr th:each="a : ${adminList}">
+                        
+                          <td th:text="${a.email}"></td>
+                          <td th:text="${a.uname}"></td>
+                          <td th:text="${a.address}"></td>
+                          <td th:text="${a.phone}"></td>
+                          <td>
+                          	<form th:action="@{/editAdmin}" th:object="${selectUserForm}" method="POST" >
+                          		<input type="hidden" name="currentAdmin" th:value="${admin.email}" required>
+ 								<input type="hidden" name="email" th:value="${a.email}" required>
+ 								<input type="hidden" name="uname" th:value="${a.uname}" required>
+ 								<input type="hidden" name="address" th:value="${a.address}" required>
+ 								<input type="hidden" name="phone" th:value="${a.phone}" required>
+  								<button class="fa fa-pencil-square-o w3-bar-item w3-button w3-right  w3-mobile" type="submit" ><i class="w3-margin-right"></i> </button>
+  						  	</form> 
+  						  </td>
+                          <td>     
+                          	<form th:action="@{/deleteAdmin}" th:object="${selectUserForm}" method="POST" >
+                          		<input type="hidden" name="currentAdmin" th:value="${admin.email}" required>
+ 								<input type="hidden" name="email" th:value="${a.email} " required>
+  								<button class="fa fa-remove w3-bar-item w3-button w3-right  w3-mobile" type="submit" ><i class="w3-margin-right"></i> </button>
+  						  	</form> 
+  						   </td>
+                      
+                        </tr>
+                     </table>
+                  </div>
+               </div>
+            </div>
+         </div>
+         
+         <div class="w3-twothird">
+            <div class="w3-container w3-card w3-white w3-margin-bottom">
+               <h2 class="w3-text-grey w3-padding-16"><i class="fa fa-suitcase fa-fw w3-margin-right w3-xxlarge w3-text-teal"></i>Edit User Information</h2>
+               <a  class=" w3-bar-item w3-button w3-mobile" th:href="@{/addUser}">add a new user</a>
+               <div class="w3-container">
+                  <div class="w3-responsive" style=" height:300px;overflow:auto;">
+                     <table class="w3-table-all">
                         <tr>
-                           <form action="Customer_Rep" method="post">
-                              <!-- <input type="hidden" name="action" value="edit">
-                              <input type="hidden" name="login" value=<%=login%>>
-                              <input type="hidden" name="cID" value=<%=id%>>
-                              <input type="hidden" name="type" value="employee">
-                              <td><button class="w3-button w3-dark-grey" type="submit">Submit</button> </td>
-                              <td><%=id%></td>
-                              <td><input class="w3-input w3-border" type="text"  name="cFirstName"  style="width: 100px;" value=<%=firstName%>></td>
-                              <td><input class="w3-input w3-border" type="text"  name="cLastName"  style="width: 100px;" value=<%=lastName%>></td>
-                              <td><input class="w3-input w3-border" type="text"  name="cAddress"  style="width: 100px;" value=<%=cAddress%>></td>
-                              <td><input class="w3-input w3-border" type="text"  name="cCity"  style="width: 100px;" value=<%=cCity%>></td>
-                              <td><input class="w3-input w3-border" type="text"  name="cState"  style="width: 100px;" value=<%=cState%>></td>
-                              <td><input class="w3-input w3-border" type="text"  name="cZipCode"  style="width: 100px;" value=<%=cZipCode%>></td>
-                              <td><input class="w3-input w3-border" type="text"  name="cEmail"  style="width: 100px;" value=<%=email%>></td>
-                              <td><input class="w3-input w3-border" type="text"  name="cCreationDate"  style="width: 100px;" value=<%=CreationDate%>></td> -->
-                           </form>
+                           <th>Email</th>
+                           <th>Name</th>
+                           <th>Address</th>
+                           <th>Phone</th>
+                        </tr>
+                        <tr th:each="user : ${userList}">
+                        
+                          <td th:text="${user.email}"></td>
+                          <td th:text="${user.uname}"></td>
+                          <td th:text="${user.address}"></td>
+                          <td th:text="${user.phone}"></td>
+                          <td>
+                          	<form th:action="@{/editUser}" th:object="${selectUserForm}" method="POST" >
+                          		<input type="hidden" name="currentAdmin" th:value="${admin.email}" required>
+ 								<input type="hidden" name="email" th:value="${user.email}" required>
+ 								<input type="hidden" name="uname" th:value="${user.uname}" required>
+ 								<input type="hidden" name="address" th:value="${user.address}" required>
+ 								<input type="hidden" name="phone" th:value="${user.phone}" required>
+  								<button class="fa fa-pencil-square-o w3-bar-item w3-button w3-right  w3-mobile" type="submit" ><i class="w3-margin-right"></i> </button>
+  						  	</form> 
+  						  </td>
+                          <td>     
+                          	<form th:action="@{/deleteUser}" th:object="${selectUserForm}" method="POST" >
+                          		<input type="hidden" name="currentAdmin" th:value="${admin.email}" required>
+ 								<input type="hidden" name="email" th:value="${user.email} " required>
+  								<button class="fa fa-remove w3-bar-item w3-button w3-right  w3-mobile" type="submit" ><i class="w3-margin-right"></i> </button>
+  						  	</form> 
+  						   </td>
+                      
                         </tr>
                      </table>
                   </div>
