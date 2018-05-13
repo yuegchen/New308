@@ -26,7 +26,7 @@ public class RedistrictHelpers {
 		return em.find(State.class, stateId).initDistList();
 	}
 	
-	
+
 	public double calculateGoodness(District d, double[] weights) throws IOException {
 		double compactness = calculateCompactness(d, weights[0]);
 		double population = calculatePopulation(d, weights[1]);
@@ -38,32 +38,34 @@ public class RedistrictHelpers {
 	}
 
 	public boolean checkConstraint(Precinct precinct, District d2) {
-		List<District> neighborDistrictList = d2.getNeighborDistricts();
-		for (District d : neighborDistrictList) {
-			if ((d.getBorderingPrecinctList().contains(precinct))) {
+		List<Precinct> neighborPrecinctList = precinct.getNeighborPrecinctList();
+		
+		for (Precinct p : neighborPrecinctList) {
+			if (p != null && p.getCd()==d2.getDId()) {
 				return true;
 			}
+			
 		}
 		return false;
 	}
 
-	public void moveTo(Precinct precinct, District d1, District d2, boolean out) {
-		List<Precinct> precinctList = d1.getPrecinctList();
+	public String moveTo(Precinct precinct, District d1, District d2, boolean out) {
+		List<Precinct> precinctList = d1.initPrecList();
 		precinctList.remove(precinct);
 		d1.setPrecinctList(precinctList); 
 		
-		List<Precinct> borderingPrecinctList = d1.getBorderingPrecinctList();
+		List<Precinct> borderingPrecinctList = d1.initBorderingPrecinctList();
 		borderingPrecinctList.remove(precinct);
 		d1.setBorderingPrecinctList(borderingPrecinctList);
 		
-		List<Precinct> precinctList2 = d2.getPrecinctList();
+		List<Precinct> precinctList2 = d2.initPrecList();
 		precinctList2.add(precinct);
 		d2.setPrecinctList(precinctList2);
 		
-		List<Precinct> borderingPrecinctList2 = d2.getBorderingPrecinctList();
-		borderingPrecinctList2.remove(precinct);
+		List<Precinct> borderingPrecinctList2 = d2.initBorderingPrecinctList();
+		borderingPrecinctList2.add(precinct);
 		d2.setBorderingPrecinctList(borderingPrecinctList2);
-		
+				
 		if(!out){
 			List<Integer> intoPList = d2.getIntoPList();
 			intoPList.add(precinct.getPid());
@@ -71,12 +73,11 @@ public class RedistrictHelpers {
 		}
 		else{
 			List<Integer> intoPList = d1.getIntoPList();
-			intoPList.remove(precinct.getPid());
+			boolean test=intoPList.remove((Integer)precinct.getPid());
 			d1.setIntoPList(intoPList);
 		}
-		move = "{ \"movedPrecincts\" : [[ 'districtId': '"+d2.getDId()+"', \"precinctId\": ["+precinct.getPid()+"]]]}";
-		System.out.println("move "+precinct.getPid()+" from "+d1.getDId()+" to "+d2.getDId());
-		
+		return "{ \"movedPrecinct\" :  \"districtId\" : " + d2.getDId() + ", \"precinctId\": " + precinct.getPid() + "}";
+		// System.out.println("move "+precinct.getPid()+" from "+d1.getDId()+" to "+d2.getDId());
 	}
 	
 	public double calculateCompactness(District d, double weight) throws IOException {

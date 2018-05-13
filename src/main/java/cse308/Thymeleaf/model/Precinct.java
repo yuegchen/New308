@@ -31,7 +31,8 @@ public class Precinct {
 	@Id
 	private 	int 		pid;
 	private 	String 		name;
-	private 	int 	cd;
+	private 	int 		cd;
+	private		int			stateId;
 	
 	private		double		area;
 	
@@ -39,11 +40,12 @@ public class Precinct {
 	private List<NeighborPrecinct> neighborPrecincts;
 	
 
-	public Precinct(int pid, String name, int cd, int area) {
+	public Precinct(int pid, String name, int cd, int area, int stateId) {
 		this.pid = pid;
 		this.name = name;
 		this.cd = cd;
 		this.area = area;
+		this.stateId = stateId;
 	}
 	
 	public Precinct(){
@@ -74,6 +76,13 @@ public class Precinct {
 		this.cd = cd;
 	}
 	
+	public int getStateId(){
+		return stateId;
+	}
+	
+	public void setStateId(int stateId){
+		this.stateId = stateId;
+	}
 //    @ManyToOne
 //    @JoinColumn(name = "CD")
 //	public District getDistrict(){
