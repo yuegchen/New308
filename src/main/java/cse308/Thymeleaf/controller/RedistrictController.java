@@ -29,11 +29,13 @@ public class RedistrictController {
     private SimpMessagingTemplate smt;
     
     private boolean endingCondition = true;
+    private int     stateId;
 
 	@MessageMapping("/redistrict")
 	@SendTo("/redistrict/reply")
-	public String processRequestsFromClient(@Payload String request){
-		String requestType = new Gson().fromJson(request, Map.class).get("request").toString().toUpperCase();
+	public String processRequestsfromClient(@Payload String request){
+		Map request = new Gson().fromJson(request, Map.class);
+		String requestType = request.get("request").toString().toUpperCase();
 		switch(RecoloringOption.valueOf(requestType)){
 			case START:
 				endingCondition = true;
@@ -61,20 +63,53 @@ public class RedistrictController {
 	@Component
 	@Scope("prototype")
 	public class RedistrictingThread implements Runnable{
-		
+		RedistrictHelpers rh = new RedistrictHelpers();
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
+		EntityManager em = emf.createEntityManager();		
 		@Override
 		public void run(){
 			while(endingCondition){
 				try {
-					Thread.sleep(3000);
-					
-					smt.convertAndSend("/redistrict/reply", "Keep Going");
+					List<District> districts = rh.getDistrictsByState(stateId, em);
+
+					end_redistricting:
+					if(endingCondition){
+						for(District district:districts){
+							List<Precinct> borderPrecincts = district.initBorderingPrecincts();
+							List<District> neighborDistricts = district.getNeighborDistricts();
+							for(District to:neighborDistricts){
+								tryMove(borderPrecincts,district,to);
+								if(endingCondition){
+									break end_redistricting;
+								}
+							}
+
+						}
+					}
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
-			System.out.println("done");
+		}
+
+		private void tryMove(List<Precinct> borderPrecincts, District fromDistrict, District toDistrict) throws IOException {
+			double originalScore = rh.calculateGoodness(fromDistrict) + rh.calculateGoodness(toDistrict);
+			for (Precinct precinct : borderPrecincts) {
+				if(rh.checkConstraint(precinct,toDistrict))
+					rh.moveTo(precinct, fromDistrict, toDistrict, false);
+				else
+					continue;
+				double newScore = rh.calculateGoodness(fromDistrict) + rh.calculateGoodness(toDistrict);
+				if (newScore > originalScore) {
+					originalScore = newScore;
+					Thread.sleep(1000);
+				}
+				else{
+					rh.moveTo(precinct,toDistrict,fromDistrict, true);
+
+				}
+			}
 		}
 	}
 }

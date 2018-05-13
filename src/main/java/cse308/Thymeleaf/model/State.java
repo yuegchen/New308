@@ -157,7 +157,7 @@ public class State {
 	        EntityManager em = emf.createEntityManager();
 	        
 	        List <?> distIdList = (List <?>) em.createNativeQuery(
-	                "SELECT d.cd FROM DISTRICT d WHERE d.stateid = ?1")
+	                "SELECT d.cd FROM DISTRICT d WHERE d.stateid = ?")
 	            .setParameter(1, this.stateId)
 	            .getResultList();
 	        
