@@ -18,11 +18,9 @@ public class NeighborPrecinct {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private		int			id;
-	
 	private		int			nid;
 	private		Precinct	precinct;
 	
-
 	public NeighborPrecinct(int nid, Precinct precinct) {
 		this.nid = nid;
 		this.precinct = precinct;
