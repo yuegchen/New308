@@ -19,6 +19,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.geotools.geojson.geom.GeometryJSON;
 

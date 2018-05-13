@@ -45,9 +45,7 @@ public class RedistrictingController {
 				
 				System.out.println("stop");
 				tryMove(borderPrecinctList,d,to);
-				break;
 			}
-			break;
 		}
 		
 		System.out.println("stop");
@@ -58,9 +56,14 @@ public class RedistrictingController {
 
 	private void tryMove(List<Precinct> borderPrecinctList,District from, District to) throws IOException {
 		double originalScore=calculateGoodness(from)+calculateGoodness(to);
+		System.out.println("originalScore: "+originalScore);
 		System.err.println("stop4");
 		System.out.println("Border Precinct List Size " + borderPrecinctList.size());
-		for (Precinct precinct : borderPrecinctList) {
+		List<Precinct> tempBorderPList=new ArrayList<Precinct>();
+		for(Precinct precinct : borderPrecinctList){
+			tempBorderPList.add(precinct);
+		}
+		for (Precinct precinct : tempBorderPList) {
 			if(checkConstraint(precinct,to)){
 				moveTo(precinct, from, to, false);
 				System.err.println("stop2");
@@ -68,14 +71,14 @@ public class RedistrictingController {
 			else
 				continue;
 			double newScore=calculateGoodness(from)+calculateGoodness(to);
+			System.out.println("new Score: "+newScore);
 			if (newScore > originalScore) {
-				
 				originalScore=newScore;
-				break;
 			}
 			else
 				moveTo(precinct,to,from, true);
 		}
+		
 		System.err.println("stop3");
 		
 	}
@@ -94,9 +97,11 @@ public class RedistrictingController {
 //		List<District> neighborDistrictList = d2.getNeighborDistricts();
 		List<Precinct> neighborPrecinctList = precinct.getNeighborPrecinctList();
 //		System.out.println("N District Size List " + neighborDistrictList.size());
+		System.err.println("neighborPrecinctList Size" + neighborPrecinctList.size());
+		System.err.println("Precinct id: " + precinct.getPid());
 		
 		for (Precinct p : neighborPrecinctList) {
-			if (p.getCd()==d2.getDId()) {
+			if (p != null && p.getCd()==d2.getDId()) {
 				System.out.println("true");
 				return true;
 			}
@@ -119,19 +124,20 @@ public class RedistrictingController {
 		d2.setPrecinctList(precinctList2);
 		
 		List<Precinct> borderingPrecinctList2 = d2.initBorderingPrecinctList();
-		borderingPrecinctList2.remove(precinct);
+		borderingPrecinctList2.add(precinct);
 		d2.setBorderingPrecinctList(borderingPrecinctList2);
 				
 		if(!out){
 			List<Integer> intoPList = d2.getIntoPList();
 			System.out.println("intoPList size: "+intoPList.size());
 			
+			
 			intoPList.add(precinct.getPid());
 			d2.setIntoPList(intoPList);
 		}
 		else{
 			List<Integer> intoPList = d1.getIntoPList();
-			intoPList.remove(precinct.getPid());
+			boolean test=intoPList.remove((Integer)precinct.getPid());
 			d1.setIntoPList(intoPList);
 		}
 		move = "{ \"movedPrecincts\" : [[ 'districtId': '"+d2.getDId()+"', \"precinctId\": ["+precinct.getPid()+"]]]}";

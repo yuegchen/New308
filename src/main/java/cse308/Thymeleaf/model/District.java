@@ -15,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Persistence;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.geotools.geojson.geom.GeometryJSON;
 
@@ -34,10 +35,13 @@ public class District {
     @Column(name = "CD")
     private int districtId;
 
+    @Transient
     private List<Integer> movedIntoPrecinctList= new ArrayList <Integer>(); //store precincts with their id
 
+    @Transient
     private List <Precinct> borderingPrecinctList = new ArrayList <Precinct>();;
     
+    @Transient
     private List <Precinct> precinctList = new ArrayList <Precinct> (); //store precincts with their id
 
     private int stateId = 27;
@@ -89,23 +93,20 @@ public class District {
 //  }
   
   public List <Precinct> initBorderingPrecinctList() {
-	  EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
-	  EntityManager em = emf.createEntityManager();
-      List <?> borderPrecIdList = (List <?> ) em.createNativeQuery(
-              "SELECT bp.pid FROM BORDERING_PRECINCT bp WHERE bp.DISTRICT_CD = ?")
-          .setParameter(1, districtId)
-          .getResultList();
-      
-      List <Precinct> borderPrecList = new ArrayList<Precinct>();
-      for (int i = 0; i < borderPrecIdList.size(); i++) {
-          Precinct precinct = em.find(Precinct.class, (int) borderPrecIdList.get(i));
-          borderPrecList.add(precinct);
-      }
-      return borderPrecList;
-  }
-  
-  public List<Precinct> getBorderingPrecinctList(){
-	  return borderingPrecinctList;
+	  if(borderingPrecinctList.size() == 0){
+		  EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
+		  EntityManager em = emf.createEntityManager();
+	      List <?> borderPrecIdList = (List <?> ) em.createNativeQuery(
+	              "SELECT bp.pid FROM BORDERING_PRECINCT bp WHERE bp.DISTRICT_CD = ?")
+	          .setParameter(1, districtId)
+	          .getResultList();
+	      
+	      for (int i = 0; i < borderPrecIdList.size(); i++) {
+	          Precinct precinct = em.find(Precinct.class, (int) borderPrecIdList.get(i));
+	          borderingPrecinctList.add(precinct);
+	      }
+	  }
+      return borderingPrecinctList;
   }
   
   public void setBorderingPrecinctList(List<Precinct> bPrecinctList){
@@ -121,24 +122,21 @@ public class District {
 	}
     
 	public List<Precinct> initPrecList(){
-    	EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
-    	EntityManager em = emf.createEntityManager();
-    	List<?> precIdList = (List<?>) em.createQuery(
-				"SELECT p.pid FROM Precinct p WHERE p.cd = :cd")
-				.setParameter("cd", districtId)
-				.getResultList();
-    	List<Precinct> precList = new ArrayList<Precinct>();
-    	for(int i = 0; i < precIdList.size(); i++){
-    		Precinct precinct = em.find(Precinct.class, (int)precIdList.get(i));
-    		precList.add(precinct);
-    	}
-    	return precList;
-    }
-    
-    public List<Precinct> getPrecinctList(){
+		if(precinctList.size() == 0){
+	    	EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
+	    	EntityManager em = emf.createEntityManager();
+	    	List<?> precIdList = (List<?>) em.createQuery(
+					"SELECT p.pid FROM Precinct p WHERE p.cd = :cd")
+					.setParameter("cd", districtId)
+					.getResultList();
+	    	for(int i = 0; i < precIdList.size(); i++){
+	    		Precinct precinct = em.find(Precinct.class, (int)precIdList.get(i));
+	    		precinctList.add(precinct);
+	    	}
+		}
     	return precinctList;
     }
-    
+        
     public void setPrecinctList(List<Precinct> precinctList){
     	this.precinctList = precinctList;
     }
