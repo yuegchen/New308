@@ -1,5 +1,6 @@
 package cse308.Thymeleaf.controller;
 
+import java.io.*;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -7,6 +8,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import cse308.Thymeleaf.form.LoginForm;
+import cse308.Thymeleaf.form.PropertyForm;
 import cse308.Thymeleaf.form.RedistrictingForm;
 import cse308.Thymeleaf.form.RegisterForm;
 import cse308.Thymeleaf.form.SelectUserForm;
@@ -68,14 +70,16 @@ public class MainController {
 			}
 		}
 		
-		login = "yes";
+		
 		if(admin==null){
+			login = "yes";
 			model.addAttribute("user", user);
 			entitymanager.close();
 			emfactory.close();
 			return "UserCenter";
 		}
 		else{
+			login = "no";
 			userList =(List<User>) entitymanager.createQuery(
 					"SELECT u FROM User u").getResultList();
 			adminList =(List<Admin>) entitymanager.createQuery(
@@ -84,6 +88,8 @@ public class MainController {
 			model.addAttribute("adminList", adminList);
 			SelectUserForm selectUserForm = new SelectUserForm();
 			model.addAttribute("selectUserForm", selectUserForm);
+			PropertyForm propertyForm = new PropertyForm();
+			model.addAttribute("propertyForm", propertyForm);
 			model.addAttribute("userList", userList);
 			model.addAttribute("admin", admin);
 			entitymanager.close();
@@ -174,7 +180,10 @@ public class MainController {
 				"SELECT u FROM User u").getResultList();
 		adminList =(List<Admin>) entitymanager.createQuery(
 				"SELECT a FROM Admin a").getResultList();
-
+		PropertyForm propertyForm = new PropertyForm();
+		model.addAttribute("propertyForm", propertyForm);
+		SelectUserForm selectUserForm2 = new SelectUserForm();
+		model.addAttribute("selectUserForm", selectUserForm2);
 		model.addAttribute("adminList", adminList);
 		model.addAttribute("userList", userList);
 		model.addAttribute("admin", admin);
@@ -203,7 +212,10 @@ public class MainController {
 				"SELECT u FROM User u").getResultList();
 		adminList =(List<Admin>) entitymanager.createQuery(
 				"SELECT a FROM Admin a").getResultList();
-
+		PropertyForm propertyForm = new PropertyForm();
+		model.addAttribute("propertyForm", propertyForm);
+		SelectUserForm selectUserForm2 = new SelectUserForm();
+		model.addAttribute("selectUserForm", selectUserForm2);
 		model.addAttribute("adminList", adminList);
 		model.addAttribute("userList", userList);
 		model.addAttribute("admin", admin);
@@ -281,7 +293,8 @@ public class MainController {
 		model.addAttribute("admin", admin);
 		SelectUserForm selectUserForm2 = new SelectUserForm();
 		model.addAttribute("selectUserForm", selectUserForm2);
-		
+		PropertyForm propertyForm = new PropertyForm();
+		model.addAttribute("propertyForm", propertyForm);
 		entitymanager.close();
 		emfactory.close();
 		return "admincenter";
@@ -315,7 +328,8 @@ public class MainController {
 		model.addAttribute("admin", admin);
 		SelectUserForm selectUserForm2 = new SelectUserForm();
 		model.addAttribute("selectUserForm", selectUserForm2);
-		
+		PropertyForm propertyForm = new PropertyForm();
+		model.addAttribute("propertyForm", propertyForm);
 		entitymanager.close();
 		emfactory.close();
 		return "admincenter";
@@ -405,7 +419,8 @@ public class MainController {
 		model.addAttribute("admin", admin);
 		SelectUserForm selectUserForm2 = new SelectUserForm();
 		model.addAttribute("selectUserForm", selectUserForm2);
-		
+		PropertyForm propertyForm = new PropertyForm();
+		model.addAttribute("propertyForm", propertyForm);
 		entitymanager.close();
 		emfactory.close();
 		return "admincenter";
@@ -453,9 +468,36 @@ public class MainController {
 		model.addAttribute("admin", admin);
 		SelectUserForm selectUserForm2 = new SelectUserForm();
 		model.addAttribute("selectUserForm", selectUserForm2);
-		
+		PropertyForm propertyForm = new PropertyForm();
+		model.addAttribute("propertyForm", propertyForm);
 		entitymanager.close();
 		emfactory.close();
+		return "admincenter";
+	}
+	@RequestMapping(value = { "/editProperty" }, method = RequestMethod.POST)
+	public String editProperty(Model model,
+			@ModelAttribute("propertyForm") PropertyForm propertyForm) {
+		int max1=propertyForm.getMax1();
+		int max2=propertyForm.getMax2();
+		String str = "MAX_MOVES="+max1+"\r\n"+
+"MAX_NON_IMPROVED_STEPS="+max2;
+	    BufferedWriter writer;
+		try {
+			writer = new BufferedWriter(new FileWriter("C:\\eclipse\\Projects\\New308\\src\\main\\resources\\static\\externalProperty\\Property.txt"));
+			writer.write(str);
+		    writer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	   
+		model.addAttribute("adminList", adminList);
+		model.addAttribute("userList", userList);
+		model.addAttribute("admin", admin);
+		SelectUserForm selectUserForm2 = new SelectUserForm();
+		model.addAttribute("selectUserForm", selectUserForm2);
+		PropertyForm propertyForm2 = new PropertyForm();
+		model.addAttribute("propertyForm", propertyForm2);
 		return "admincenter";
 	}
 	
