@@ -65,7 +65,6 @@ public class RedistrictingController {
 		}
 		
 	}
-	
 	public double calculateGoodness(District d) throws IOException {
 		double compactness = calculateCompactness(d, weights[0]);
 		double population = calculatePopulation(d, weights[1]);
@@ -128,7 +127,6 @@ public class RedistrictingController {
 	}
 
 	public double calculatePopulation(District d, double weight) {
-
 		return 0;
 	}
 
