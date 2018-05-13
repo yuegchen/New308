@@ -32,13 +32,48 @@ public class Precinct {
 	private 	int 		pid;
 	private 	String 		name;
 	private 	int 	cd;
-	
 	private		double		area;
 	
 //	private		District	district;
 	private List<NeighborPrecinct> neighborPrecincts;
+	//add
+	private int population;
+	private double dem;
+	private double rep;
+	private int sid;
 	
+	public double getDem() {
+		return dem;
+	}
 
+	public void setDem(double dem) {
+		this.dem = dem;
+	}
+	
+	public double getRep() {
+		return rep;
+	}
+
+	public void setRep(double rep) {
+		this.rep = rep;
+	}
+	
+	public int getPopulation() {
+		return population;
+	}
+
+	public void setPopulation(int population) {
+		this.population = population;
+	}
+	
+	public int getSid() {
+		return sid;
+	}
+
+	public void setSid(int sid) {
+		this.sid = sid;
+	}//end
+	
 	public Precinct(int pid, String name, int cd, int area) {
 		this.pid = pid;
 		this.name = name;
@@ -89,6 +124,7 @@ public class Precinct {
 	public double getArea(){
 		return area;
 	}
+
 	
 	public double initArea() throws IOException{
 		double tempArea = 0;

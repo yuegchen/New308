@@ -34,7 +34,7 @@ public class District {
     @Id
     @Column(name = "CD")
     private int districtId;
-
+    
     @Transient
     private List<Integer> movedIntoPrecinctList= new ArrayList <Integer>(); //store precincts with their id
 
@@ -136,6 +136,35 @@ public class District {
 		}
     	return precinctList;
     }
+	//add
+	public int getPop() {
+		int pop = 0;
+		for (Precinct p : initPrecList()) {
+			pop += p.getPopulation();
+		}
+
+		return pop;
+	}
+	
+	public double getDem(){
+		double dem=0;
+		double demPop=0;
+		for (Precinct p : initPrecList()) {
+			demPop+= p.getPopulation()*p.getDem();
+		}
+		dem=demPop/(double)getPop();
+		return dem;
+	}
+	
+	public double getRep(){
+		double rep=0;
+		double repPop=0;
+		for (Precinct p : initPrecList()) {
+			repPop+= p.getPopulation()*p.getRep();
+		}
+		rep=repPop/(double)getPop();
+		return rep;
+	}//end
         
     public void setPrecinctList(List<Precinct> precinctList){
     	this.precinctList = precinctList;
