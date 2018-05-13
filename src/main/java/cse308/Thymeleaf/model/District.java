@@ -34,7 +34,7 @@ public class District {
     @Id
     @Column(name = "CD")
     private int districtId;
-
+    
     @Transient
     private List<Integer> movedIntoPrecinctList= new ArrayList <Integer>(); //store precincts with their id
 
@@ -74,8 +74,10 @@ public class District {
 	  EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
 	  EntityManager em = emf.createEntityManager();
       List <?> nDistIdList = (List <?> ) em.createNativeQuery(
-    		  "SELECT nd.NDISTRICTID FROM NEIGHBOR_DISTRICT nd WHERE nd.DISTRICT_CD = ?")
+    		  "SELECT nd.NDISTRICTID FROM NEIGHBOR_DISTRICT nd WHERE nd.DISTRICT_CD = ?1"
+    		  + " AND nd.SID = ?2")
           .setParameter(1, districtId)
+          .setParameter(2, stateId)
           .getResultList();
       
       List <District> nDistList = new ArrayList<District>();
@@ -96,9 +98,11 @@ public class District {
 	  if(borderingPrecinctList.size() == 0){
 		  EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
 		  EntityManager em = emf.createEntityManager();
-	      List <?> borderPrecIdList = (List <?> ) em.createNativeQuery(
-	              "SELECT bp.pid FROM BORDERING_PRECINCT bp WHERE bp.DISTRICT_CD = ?")
+	      List <?> borderPrecIdList = (List <?>) em.createNativeQuery(
+	              "SELECT bp.pid FROM BORDERING_PRECINCT bp, PRECINCT p WHERE bp.DISTRICT_CD = ?1"
+	              + " AND p.SID = ?2 AND p.PID = bp.PID")
 	          .setParameter(1, districtId)
+	          .setParameter(2, stateId)
 	          .getResultList();
 	      
 	      for (int i = 0; i < borderPrecIdList.size(); i++) {
@@ -126,8 +130,9 @@ public class District {
 	    	EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
 	    	EntityManager em = emf.createEntityManager();
 	    	List<?> precIdList = (List<?>) em.createQuery(
-					"SELECT p.pid FROM Precinct p WHERE p.cd = :cd")
+					"SELECT p.pid FROM Precinct p WHERE p.cd = :cd AND p.sid = :sid")
 					.setParameter("cd", districtId)
+					.setParameter("sid", stateId)
 					.getResultList();
 	    	for(int i = 0; i < precIdList.size(); i++){
 	    		Precinct precinct = em.find(Precinct.class, (int)precIdList.get(i));
@@ -136,6 +141,34 @@ public class District {
 		}
     	return precinctList;
     }
+	public int getPop() {
+		int pop = 0;
+		for (Precinct p : initPrecList()) {
+			pop += p.getPopulation();
+		}
+
+		return pop;
+	}
+	
+	public double getDem(){
+		double dem=0;
+		double demPop=0;
+		for (Precinct p : initPrecList()) {
+			demPop+= p.getPopulation()*p.getDem();
+		}
+		dem=demPop/(double)getPop();
+		return dem;
+	}
+	
+	public double getRep(){
+		double rep=0;
+		double repPop=0;
+		for (Precinct p : initPrecList()) {
+			repPop+= p.getPopulation()*p.getRep();
+		}
+		rep=repPop/(double)getPop();
+		return rep;
+	}
         
     public void setPrecinctList(List<Precinct> precinctList){
     	this.precinctList = precinctList;
@@ -143,7 +176,6 @@ public class District {
 	
 	public double getArea() throws IOException{
 		double districtArea = 0.0;
-//		System.out.println(getPrecinctList().size());
 		
 		for(Precinct precinct: initPrecList()){
 			districtArea += precinct.getArea();
@@ -159,7 +191,10 @@ public class District {
 		GeometryPrecisionReducer gpr			=	new GeometryPrecisionReducer(new PrecisionModel(10));
 		List<?>				districtBorderPrecinctIds		=	(List<?>) em.createQuery(
 				"SELECT p1.pid, p2.pid FROM Precinct p1, Precinct p2, NeighborPrecinct np WHERE (p1.pid = np.precinct.pid) AND (p2.pid = " + 
-				"np.nid AND p1.cd != p2.cd) AND (p1.cd = :cd)").setParameter("cd", districtId).getResultList();
+				"np.nid AND p1.cd != p2.cd) AND (p1.cd = :cd) AND (p1.sid = :sid)")
+				.setParameter("cd", districtId)
+				.setParameter("sid", stateId)
+				.getResultList();
 		
 		for(int i = 0; i < districtBorderPrecinctIds.size(); i++){
 			PrecinctGeometry precBound = em.find(PrecinctGeometry.class, ((Integer)((Object[]) districtBorderPrecinctIds.get(i))[0]));

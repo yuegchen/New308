@@ -32,20 +32,25 @@ public class Precinct {
 	private 	int 		pid;
 	private 	String 		name;
 	private 	int 		cd;
-	private		int			stateId;
-	
+	private		int			sid;
 	private		double		area;
+	private 	int 		population;
+	private 	double 		dem;
+	private 	double 		rep;
 	
-//	private		District	district;
+	@Transient
 	private List<NeighborPrecinct> neighborPrecincts;
 	
-
-	public Precinct(int pid, String name, int cd, int area, int stateId) {
+	public Precinct(int pid, String name, int cd, double area, int sid, int population, 
+			double dem, double rep) {
 		this.pid = pid;
 		this.name = name;
 		this.cd = cd;
 		this.area = area;
-		this.stateId = stateId;
+		this.sid = sid;
+		this.population = population;
+		this.dem = dem;
+		this.rep = rep;
 	}
 	
 	public Precinct(){
@@ -76,12 +81,36 @@ public class Precinct {
 		this.cd = cd;
 	}
 	
-	public int getStateId(){
-		return stateId;
+	public int getSid(){
+		return sid;
 	}
 	
-	public void setStateId(int stateId){
-		this.stateId = stateId;
+	public void setSid(int sid){
+		this.sid = sid;
+	}
+	
+	public double getDem() {
+		return dem;
+	}
+
+	public void setDem(double dem) {
+		this.dem = dem;
+	}
+	
+	public double getRep() {
+		return rep;
+	}
+
+	public void setRep(double rep) {
+		this.rep = rep;
+	}
+	
+	public int getPopulation() {
+		return population;
+	}
+
+	public void setPopulation(int population) {
+		this.population = population;
 	}
 //    @ManyToOne
 //    @JoinColumn(name = "CD")
@@ -98,6 +127,7 @@ public class Precinct {
 	public double getArea(){
 		return area;
 	}
+
 	
 	public double initArea() throws IOException{
 		double tempArea = 0;

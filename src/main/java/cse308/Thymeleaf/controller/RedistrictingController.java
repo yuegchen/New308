@@ -29,6 +29,7 @@ public class RedistrictingController {
 	private static int MAX_MOVES=0;
 	private static int MAX_NON_IMPROVED_STEPS=0;
 	private static String move="";
+	private static Plan plan;
 
 	@RequestMapping(value = { "/redistrict" }, method = RequestMethod.POST)
 	public String startAlgo(Model model, //
@@ -93,7 +94,7 @@ public class RedistrictingController {
 
 	private void tryMove(List<Precinct> borderPrecinctList,District from, District to) throws IOException {
 		System.err.println("Enter tryMove!!!");
-		double originalScore=calculateGoodness(from)+calculateGoodness(to);
+		double originalScore=calculateGoodness(from,to);
 		System.out.println("originalScore: "+originalScore);
 		System.err.println("stop4");
 		System.out.println("Border Precinct List Size " + borderPrecinctList.size());
@@ -109,7 +110,7 @@ public class RedistrictingController {
 			}
 			else
 				continue;
-			double newScore=calculateGoodness(from)+calculateGoodness(to);
+			double newScore=calculateGoodness(from,to);
 			System.out.println("new Score: "+newScore);
 			if (newScore > originalScore) {
 				originalScore=newScore;
@@ -124,15 +125,14 @@ public class RedistrictingController {
 		System.err.println("stop3");
 		
 	}
-	
-	public double calculateGoodness(District d) throws IOException {
+	public double calculateGoodness(District d,District d2) throws IOException {
 		System.err.println("Enter calculateGoodness!!!");
-		double compactness = calculateCompactness(d, weights[0]);
-		double population = calculatePopulation(d, weights[1]);
-		double politicalFairness = calculatePoliticalFairness(d, weights[2]);
-		double contiguity = calculateContiguity(d, weights[3]);
-		double racialFairness = calculateRacialFairness(d, weights[4]);
-		double totalGoodness = compactness + population + politicalFairness + contiguity + racialFairness;
+		double compactness1 = calculateCompactness(d, weights[0]);
+		double compactness2 = calculateCompactness(d2, weights[0]);
+		double population = calculatePopulation(d,d2, weights[1]);
+		double politicalFairness1 = calculatePoliticalFairness(d, weights[2]);
+		double politicalFairness2 = calculatePoliticalFairness(d, weights[2]);
+		double totalGoodness = compactness1+compactness2 + population*2 + politicalFairness1+politicalFairness2;
 		return totalGoodness; 
 	}
 
@@ -167,6 +167,8 @@ public class RedistrictingController {
 		List<Precinct> borderingPrecinctList2 = d2.initBorderingPrecinctList();
 		borderingPrecinctList2.add(precinct);
 		d2.setBorderingPrecinctList(borderingPrecinctList2);
+		
+		precinct.setCd(d2.getDId());
 				
 		if(!out){
 			List<Integer> intoPList = d2.getIntoPList();
@@ -199,23 +201,22 @@ public class RedistrictingController {
 		return score*weight;
 	}
 
-	public double calculatePopulation(District d, double weight) {
-
-		return 0;
+	public double calculatePopulation(District d1,District d2, double weight) {
+		double popFairness=0;
+		int firstPop=d1.getPop();
+		int secondPop=d2.getPop();
+		popFairness=1-Math.abs(firstPop-secondPop)/(firstPop+secondPop);
+		return popFairness*weight;
 	}
 
-	public double calculatePoliticalFairness(District d, double weight) {
-
-		return 0;
+	public double calculatePoliticalFairness(District d1, double weight) {
+		double politicalFairness=0;
+		double dem=d1.getDem();
+		double rep=d1.getRep();
+		politicalFairness=1-Math.abs(dem-rep);
+		
+		return politicalFairness*weight;
 	}
 
-	public double calculateContiguity(District d, double weight) {
-
-		return 0;
-	}
-
-	public double calculateRacialFairness(District d, double weight) {
-
-		return 0;
-	}
+	
 }

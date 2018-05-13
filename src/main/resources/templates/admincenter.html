@@ -57,7 +57,22 @@
                   </div>
                </div> 
             </div><br>
-               	
+               	<form th:action="@{/editProperty}"
+         					th:object="${propertyForm}" method="POST">
+                            <div class="container">
+                                <h1>Change External Property</h1>
+                                <hr>
+                                <label for="max1"><b>MAX_MOVES</b></label>
+                                <input type="number" value=2000 name="max1" th:field="*{max1}" required>
+
+                                <label for="max2"><b>MAX_NON_IMPROVED_STEPS</b></label>
+                                <input type="number" value=100  name="max2" th:field="*{max2}" required>
+
+                                <div class="clearfix">
+                                    <button type="submit" class="signupbtn" onclick="return Button1_onclick()">Submit</button>
+                                </div>
+                            </div>
+                        </form>
          </div>
        
          <!-- End Left Column -->
