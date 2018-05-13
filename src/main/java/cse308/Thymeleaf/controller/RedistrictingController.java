@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-
+import java.io.*;
 import cse308.Thymeleaf.form.RedistrictingForm;
 import cse308.Thymeleaf.form.RegisterForm;
 import cse308.Thymeleaf.model.*;
@@ -24,12 +24,37 @@ import cse308.Thymeleaf.model.*;
 public class RedistrictingController {
 	private static State state;
 	private static double[] weights={1,0,0,0,0};
+	private static int steps=0;
+	private static int non_steps=0;
+	private static int MAX_MOVES=0;
+	private static int MAX_NON_IMPROVED_STEPS=0;
 	private static String move="";
 
 	@RequestMapping(value = { "/redistrict" }, method = RequestMethod.POST)
 	public String startAlgo(Model model, //
 			@ModelAttribute("redistrictingForm") RedistrictingForm redistrictingForm) throws IOException {
 		System.err.println("Enter startAlgo!!!");
+
+		File file = new File("C:\\eclipse\\Projects\\New308\\src\\main\\resources\\static\\externalProperty\\Property.txt");
+
+		BufferedReader br = new BufferedReader(new FileReader(file));
+
+		String st;
+		int i=0;
+		while ((st = br.readLine()) != null){
+			System.out.println(st);
+			int index=st.indexOf('=');
+			if(i==0){
+				MAX_MOVES=Integer.parseInt(st.substring(index+1, st.length()));
+			}
+			else{
+				MAX_NON_IMPROVED_STEPS=Integer.parseInt(st.substring(index+1, st.length()));
+			}
+			i++;
+		}
+		System.out.println(MAX_MOVES);
+		System.out.println(MAX_NON_IMPROVED_STEPS);
+
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("Eclipselink_JPA");
 		EntityManager entitymanager = emfactory.createEntityManager();
 		state = entitymanager.find(State.class, 27);
@@ -45,6 +70,18 @@ public class RedistrictingController {
 				
 				System.out.println("stop");
 				tryMove(borderPrecinctList,d,to);
+				if(steps>=MAX_MOVES){
+					System.err.println("steps exceeds MAX_MOVES");
+					Plan plan = new Plan(1, new Date().toString(), state.getStateName(), state, "test");
+					model.addAttribute("plan", plan);
+					return "index";
+				}
+				if(non_steps>=MAX_NON_IMPROVED_STEPS){
+					System.err.println("non-steps exceeds MAX_NON_IMPROVED_STEPS");
+					Plan plan = new Plan(1, new Date().toString(), state.getStateName(), state, "test");
+					model.addAttribute("plan", plan);
+					return "index";
+				}
 			}
 		}
 		
@@ -67,6 +104,7 @@ public class RedistrictingController {
 		for (Precinct precinct : tempBorderPList) {
 			if(checkConstraint(precinct,to)){
 				moveTo(precinct, from, to, false);
+				steps++;
 				System.err.println("stop2");
 			}
 			else
@@ -75,9 +113,12 @@ public class RedistrictingController {
 			System.out.println("new Score: "+newScore);
 			if (newScore > originalScore) {
 				originalScore=newScore;
+				non_steps=0;
 			}
-			else
+			else{
+				non_steps++;
 				moveTo(precinct,to,from, true);
+			}
 		}
 		
 		System.err.println("stop3");
