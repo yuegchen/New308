@@ -45,35 +45,46 @@
 		    		});
 
 		    		ws.subscribe("/redistrict/reply", function(message) {
-		                var json = JSON.parse(message);
-		                var movedPrecinct = json['movedPrecinct'];
+		                var json = JSON.parse(message.body); 
+		                var movedPrecinct = json['movedPrecincts'];
 		                setPrecinctDistrict(movedPrecinct['precinctId'], movedPrecinct['districtId']);
 		                redraw();
-		    			alert(message.body);
+
+
 		    		});
 		    	}, function(error) { 
 		    		alert("STOMP error " + error);	
 		    	});
-	    		var stateId = stateNames.indexOf(geojsonStateData['state']);
-		    	ws.send('/app/redistrict', {}, JSON.stringify({request: 'start', stateId: stateId, weights: [1, 0, 0, 0, 0]}));
 		    }
+	    }
+	    
+
+	    function start(){
+	    	if (ws != null) {
+		    	var stateId = stateNames.indexOf(geojsonStateData['state']);
+		    	ws.send('/app/redistrict', {}, JSON.stringify({
+		    		"request": "start", 
+		    		"stateId": 27, 
+		    		"weights": [1, 0, 0, 0, 0]
+		    	}));
+	    	}
 	    }
 
 	    function pause(){
         	if (ws != null) {
-	        	ws.send('/app/redistrict', {}, JSON.stringify({request: 'pause'}));
+	        	ws.send('/app/redistrict', {}, JSON.stringify({"request": 'pause'}));
 	        }
 	    }
 
 	    function resume(){
         	if (ws != null) {
-	        	ws.send('/app/redistrict', {}, JSON.stringify({request: 'resume'}));
+	        	ws.send('/app/redistrict', {}, JSON.stringify({"request": 'resume'}));
 	        }
 	    }
-
+	    
         function disconnect(){
         	if (ws != null) {
-	        	ws.send('/app/redistrict', {}, JSON.stringify({request: 'stop'}));
+	        	ws.send('/app/redistrict', {}, JSON.stringify({"request": 'stop'}));
 	        	ws.disconnect();
      		}
     	}
@@ -103,7 +114,8 @@
 	  				<button class="tab_button" onclick="setMode(event, 'compare')">Comparison</button>
 	  				<button class="tab_button" onclick="setMode(event, 'visualize')">Visualization</button>
 				</div>
-				<a href = "javascript:redistrict()">Run WebSocket</a>
+				<a href = "javascript:redistrict()">Start WebSocket</a>
+				<a href = "javascript:start()">Run WebSocket</a>
             <a href = "javascript:disconnect()">Stop WebSocket</a>
 				<div id="redistricting" class="panel_content">
 					<h3>Automatic Redistricting</h3>

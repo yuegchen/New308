@@ -38,9 +38,6 @@ public class RedistrictHelpers {
 
 	public boolean checkConstraint(Precinct precinct, District d2) {
 		List<Precinct> neighborPrecinctList = precinct.getNeighborPrecinctList();
-		System.err.println("neighborPrecinctList Size" + neighborPrecinctList.size());
-		System.err.println("Precinct id: " + precinct.getPid());
-		
 		for (Precinct p : neighborPrecinctList) {
 			if (p != null && p.getCd()==d2.getDId()) {
 				System.out.println("true");
@@ -83,7 +80,10 @@ public class RedistrictHelpers {
 			boolean test=intoPList.remove((Integer)precinct.getPid());
 			d1.setIntoPList(intoPList);
 		}
-		return "{ \"movedPrecincts\" : [[ 'districtId': '"+d2.getDId()+"', \"precinctId\": ["+precinct.getPid()+"]]]}";
+		System.out.println("move "+precinct.getPid()+" from "+d1.getDId()+" to "+d2.getDId());
+		return "{ \"movedPrecincts\" : {\"districtId\": "+d2.getDId()+", \"precinctId\": "+precinct.getPid()+"} }";
+		
+		
 	}
 	
 	public double calculateCompactness(District d, double weight) throws IOException {

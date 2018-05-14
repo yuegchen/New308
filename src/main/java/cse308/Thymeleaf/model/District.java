@@ -32,6 +32,8 @@ import cse308.Thymeleaf.model.Type;
 public class District {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Id
+    private int id;
+    
     @Column(name = "CD")
     private int districtId;
     private int stateId;
@@ -56,6 +58,8 @@ public class District {
     public District(int districtId, int stateId) {
         this.districtId = districtId;
         this.stateId = stateId;
+        System.out.println("districtId: " + districtId);
+        
         this.precinctList = initPrecList();
         this.borderingPrecinctList = initBorderingPrecinctList();
     }
@@ -118,6 +122,14 @@ public class District {
   	this.borderingPrecinctList = bPrecinctList;
   }
 
+  	public int getId(){
+  		return id;
+  	}
+  	
+  	public void setId(int id){
+  		this.id = id;
+  	}
+  	
 	public int getDId() {
 		return districtId;
 	}
@@ -194,6 +206,7 @@ public class District {
 		for(Precinct precinct: borderingPrecinctList){
 			List<Precinct> neighborPrecincts = precinct.getNeighborPrecinctList();
 			for(Precinct nPrecinct: neighborPrecincts){
+				
 				map.put(nPrecinct.getPid(), precinct.getPid());
 			}
 		}

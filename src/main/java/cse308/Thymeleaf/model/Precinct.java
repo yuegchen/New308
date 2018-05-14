@@ -39,7 +39,8 @@ public class Precinct {
 	private 	double 		rep;
 	
 	@Transient
-	private List<NeighborPrecinct> neighborPrecincts;
+	private List<Precinct> neighborPrecincts = new ArrayList<Precinct> ();
+	
 	
 	public Precinct(int pid, String name, int cd, double area, int sid, int population, 
 			double dem, double rep) {
@@ -130,6 +131,8 @@ public class Precinct {
 
 	
 	public double initArea() throws IOException{
+		System.out.println("sid " + sid);
+		
 		double tempArea = 0;
 		EntityManagerFactory	emf				=	Persistence.createEntityManagerFactory("Eclipselink_JPA");
 		EntityManager			em				=	emf.createEntityManager();
@@ -138,18 +141,20 @@ public class Precinct {
 		em.getTransaction().begin();
 		Query query = em
 				.createQuery("UPDATE Precinct p SET p.area = :tempArea "
-				+ "WHERE p.pid= :pid");
+				+ "WHERE p.pid= :pid AND p.sid = :sid");
 		query.setParameter("tempArea", tempArea);
 		query.setParameter("pid", pid);
+		query.setParameter("sid", sid);
 		query.executeUpdate();
 		em.getTransaction().commit();
 		em.close();
 		
 		return tempArea;
-	}
+	} 
 
 //	@OneToMany(mappedBy = "precinct", cascade = CascadeType.ALL)
 	public List<Precinct> getNeighborPrecinctList(){
+		if(neighborPrecincts.size() == 0){
 		  EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
 		  EntityManager em = emf.createEntityManager();
 	      List <?> nPrecIdList = (List <?> ) em.createNativeQuery(
@@ -157,16 +162,18 @@ public class Precinct {
 	          .setParameter(1, pid)
 	          .getResultList();
 	      
-	      List <Precinct> nPrecList = new ArrayList<Precinct>();
 	      for (int i = 0; i < nPrecIdList.size(); i++) {
-	          Precinct precinct = em.find(Precinct.class, (int) nPrecIdList.get(i));
-	          nPrecList.add(precinct);
+	    	  if((int)nPrecIdList.get(i) < 999999900){
+	    		  Precinct precinct = em.find(Precinct.class, (int) nPrecIdList.get(i));
+	        	  neighborPrecincts.add(precinct);
+	    	  }
 	      }
-	      return nPrecList;
 		}
-	
-	public void setNeighborPrecinctList(List<NeighborPrecinct> neighborPrecincts){
-		this.neighborPrecincts = neighborPrecincts;
+		return neighborPrecincts;
 	}
+	
+//	public void setNeighborPrecinctList(List<NeighborPrecinct> neighborPrecincts){
+//		this.neighborPrecincts = neighborPrecincts;
+//	}
 
 }

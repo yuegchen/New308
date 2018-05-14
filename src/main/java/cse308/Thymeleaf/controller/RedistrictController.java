@@ -10,6 +10,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
@@ -50,10 +51,10 @@ public class RedistrictController {
 		Map requestJson = gson.fromJson(request, Map.class);
 		try{
 			String requestType = requestJson.get("request").toString().toUpperCase();
-			stateId = Integer.parseInt(requestJson.get("stateId").toString());
-			weights = gson.fromJson(requestJson.get("weights").toString(), double[].class);
 			switch(RecoloringOption.valueOf(requestType)){
 				case START:
+					stateId = (int) Double.parseDouble(requestJson.get("stateId").toString());
+					weights = gson.fromJson(requestJson.get("weights").toString(), double[].class);
 					endingCondition = true;
 					this.te.execute(new RedistrictingThread());
 					break;
@@ -120,6 +121,8 @@ public class RedistrictController {
 									break end_redistricting;
 								}
 								tryMove(borderPrecincts,district,to);
+								System.err.println("______________________");
+								Thread.sleep(2000);
 							}
 						}
 					}
@@ -142,11 +145,9 @@ public class RedistrictController {
 			}
 			for (Precinct precinct : tempBorderPList) {
 				if(rh.checkConstraint(precinct,toDistrict)){
-					smt.convertAndSend("/redistrict/reply", new JsonParser()
-							.parse(rh.moveTo(precinct, fromDistrict, toDistrict, false))
-							.getAsJsonObject());
+					smt.convertAndSend("/redistrict/reply", rh.moveTo(precinct, fromDistrict, toDistrict, false));
 					steps++;
-				}
+				} 
 				else
 					continue;
 				double newScore=rh.calculateGoodness(fromDistrict,toDistrict, weights);
@@ -157,9 +158,7 @@ public class RedistrictController {
 				}
 				else{
 					nonSteps++;
-					smt.convertAndSend("/redistrict/reply", new JsonParser()
-						.parse(rh.moveTo(precinct, toDistrict, fromDistrict, false))
-						.getAsJsonObject());
+					smt.convertAndSend("/redistrict/reply", rh.moveTo(precinct, toDistrict, fromDistrict, false)); 
 				}
 			}
 		}

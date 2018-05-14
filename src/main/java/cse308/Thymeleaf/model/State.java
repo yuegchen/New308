@@ -163,7 +163,7 @@ public class State {
 	            .setParameter(1, this.stateId)
 	            .getResultList();
 	        
-	        List <District> distList = new ArrayList<District>();
+	        
 	        for (int i = 0; i < distIdList.size(); i++) {
 	        	distList.add(new District((int) distIdList.get(i), stateId));
 	        }
