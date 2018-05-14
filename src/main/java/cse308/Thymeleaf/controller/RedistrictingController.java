@@ -23,12 +23,14 @@ import cse308.Thymeleaf.model.*;
 @Controller
 public class RedistrictingController {
 	private static State state;
-	private static double[] weights={1,0,0,0,0};
+	private static double[] weights={1,0,0};
 	private static int steps=0;
 	private static int non_steps=0;
 	private static int MAX_MOVES=0;
 	private static int MAX_NON_IMPROVED_STEPS=0;
+	private static int objectiveScore=0;
 	private static String move="";
+	private static String score="";
 	private static Plan plan;
 
 	@RequestMapping(value = { "/redistrict" }, method = RequestMethod.POST)
@@ -85,6 +87,18 @@ public class RedistrictingController {
 				}
 			}
 		}
+		String intoList="{ \"movedPrecincts\" : [";
+		for(District d:dList){
+			intoList=intoList+"[ 'districtId': '"+d.getDId()+"', \"precinctId\": [";
+			for(Integer pid:d.getIntoPList()){
+				intoList=intoList+pid+",";
+			}
+			intoList=intoList.substring(0, intoList.length()-1);
+			intoList=intoList+"]]";
+		}
+		intoList=intoList+"]}";
+		plan.setStateName(intoList);
+		System.out.println(intoList);
 		
 		System.out.println("stop");
 		Plan plan = new Plan(1, new Date().toString(), state.getStateName(), state, "test");
@@ -94,7 +108,9 @@ public class RedistrictingController {
 
 	private void tryMove(List<Precinct> borderPrecinctList,District from, District to) throws IOException {
 		System.err.println("Enter tryMove!!!");
+		
 		double originalScore=calculateGoodness(from,to);
+		double goal=originalScore+1;
 		System.out.println("originalScore: "+originalScore);
 		System.err.println("stop4");
 		System.out.println("Border Precinct List Size " + borderPrecinctList.size());
@@ -105,6 +121,7 @@ public class RedistrictingController {
 		for (Precinct precinct : tempBorderPList) {
 			if(checkConstraint(precinct,to)){
 				moveTo(precinct, from, to, false);
+				move = "{ \"movedPrecincts\" : {\"districtId\": "+to.getDId()+", \"precinctId\": "+precinct.getPid()+"} }";
 				steps++;
 				System.err.println("stop2");
 			}
@@ -114,11 +131,13 @@ public class RedistrictingController {
 			System.out.println("new Score: "+newScore);
 			if (newScore > originalScore) {
 				originalScore=newScore;
+				score="{ \"score\" : {\"objective\": "+newScore/goal*2+""+"} }";
 				non_steps=0;
 			}
 			else{
 				non_steps++;
 				moveTo(precinct,to,from, true);
+				move = "{ \"movedPrecincts\" : {\"districtId\": "+to.getDId()+", \"precinctId\": "+precinct.getPid()+"} }";
 			}
 		}
 		
@@ -129,6 +148,7 @@ public class RedistrictingController {
 		System.err.println("Enter calculateGoodness!!!");
 		double compactness1 = calculateCompactness(d, weights[0]);
 		double compactness2 = calculateCompactness(d2, weights[0]);
+		
 		double population = calculatePopulation(d,d2, weights[1]);
 		double politicalFairness1 = calculatePoliticalFairness(d, weights[2]);
 		double politicalFairness2 = calculatePoliticalFairness(d, weights[2]);
@@ -183,21 +203,22 @@ public class RedistrictingController {
 			boolean test=intoPList.remove((Integer)precinct.getPid());
 			d1.setIntoPList(intoPList);
 		}
-		move = "{ \"movedPrecincts\" : [[ 'districtId': '"+d2.getDId()+"', \"precinctId\": ["+precinct.getPid()+"]]]}";
+		
 		System.out.println("move "+precinct.getPid()+" from "+d1.getDId()+" to "+d2.getDId());
 	}
 	
 	public double calculateCompactness(District d, double weight) throws IOException {
-		System.err.println("Enter calculateCompactness!!!");
-		System.err.println("try get Perimeter!!!");
 		double perimeter = d.getPerimeter();
-		System.err.println("I get Perimeter!!!");
-		System.err.println("try get Area!!!");
+		System.err.println("Perimeter: "+perimeter);
+		if(perimeter==0){
+			return 0;
+		}
 		double area = d.getArea();
-		System.err.println("I get Area!!!");
+		System.err.println("Area: "+area);
 		double r = Math.sqrt(area / Math.PI);
 		double equalAreaPerimeter = 2 * Math.PI * r;
 		double score = 1 / (perimeter / equalAreaPerimeter);
+		System.err.println("score: "+score*weight);
 		return score*weight;
 	}
 
