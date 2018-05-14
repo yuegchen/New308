@@ -173,12 +173,23 @@ public class RedistrictingController {
 		List<Precinct> neighborPrecinctList = precinct.getNeighborPrecinctList();
 		System.err.println("neighborPrecinctList Size" + neighborPrecinctList.size());
 		System.err.println("Precinct id: " + precinct.getPid());
+		boolean vioContiguity=true;
 		
 		for (Precinct p : neighborPrecinctList) {
+			List<Precinct> tempNeighborPrecinctList = p.getNeighborPrecinctList();
+			for(Precinct p2:tempNeighborPrecinctList){
+				if(p2.getCd()==p.getCd()){
+					vioContiguity=false;
+				}
+			}
+			if(vioContiguity)
+				return false;
+			
 			if (p != null && p.getCd()==d2.getDId()) {
 				System.out.println("true");
 				return true;
 			}
+			
 			
 		}
 		return false;
