@@ -107,10 +107,10 @@ public class RedistrictingController {
 	}
 
 	private void tryMove(List<Precinct> borderPrecinctList,District from, District to) throws IOException {
-		System.err.println("Enter tryMove!!!");
+//		System.err.println("Enter tryMove!!!");
 		
 		double originalScore=calculateGoodness(from,to);
-		double goal=originalScore+1;
+		double goal=originalScore*1.37;
 		System.out.println("originalScore: "+originalScore);
 		System.err.println("stop4");
 		System.out.println("Border Precinct List Size " + borderPrecinctList.size());
@@ -121,8 +121,10 @@ public class RedistrictingController {
 		for (Precinct precinct : tempBorderPList) {
 			if(checkConstraint(precinct,to)){
 				moveTo(precinct, from, to, false);
+				
 				move = "{ \"movedPrecincts\" : {\"districtId\": "+to.getDId()+", \"precinctId\": "+precinct.getPid()+"} }";
 				steps++;
+				System.out.println("step"+steps+" :move "+precinct.getPid()+" from "+from.getDId()+" to "+to.getDId());
 				System.err.println("stop2");
 			}
 			else
@@ -132,6 +134,7 @@ public class RedistrictingController {
 			if (newScore > originalScore) {
 				originalScore=newScore;
 				score="{ \"score\" : {\"objective\": "+newScore/goal*2+""+"} }";
+				System.out.println("objective Score: "+newScore/goal*2);
 				non_steps=0;
 			}
 			else{
@@ -145,7 +148,7 @@ public class RedistrictingController {
 		
 	}
 	public double calculateGoodness(District d,District d2) throws IOException {
-		System.err.println("Enter calculateGoodness!!!");
+//		System.err.println("Enter calculateGoodness!!!");
 		double compactness1 = calculateCompactness(d, weights[0]);
 		double compactness2 = calculateCompactness(d2, weights[0]);
 		
