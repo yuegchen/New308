@@ -135,7 +135,7 @@ public class RedistrictController {
 								break end_redistricting;
 							}
 							for(Map.Entry<District, District> entry: map.entrySet())
-							tryMove(borderPrecinctsArray, entry.getKey(), entry.getValue());
+								tryMove(borderPrecinctsArray, entry.getKey(), entry.getValue());
 							//Thread.sleep(2000);
 						}
 					}
