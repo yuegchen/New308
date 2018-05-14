@@ -39,6 +39,8 @@ public class Precinct {
 	private 	double 		rep;
 	
 	@Transient
+	private List<Integer> nPrecIdList = new ArrayList<Integer>();
+	@Transient
 	private List<Precinct> neighborPrecincts = new ArrayList<Precinct> ();
 	
 	
@@ -153,11 +155,12 @@ public class Precinct {
 	} 
 
 //	@OneToMany(mappedBy = "precinct", cascade = CascadeType.ALL)
+	@SuppressWarnings("unchecked")
 	public List<Precinct> getNeighborPrecinctList(){
 		if(neighborPrecincts.size() == 0){
 		  EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
 		  EntityManager em = emf.createEntityManager();
-	      List <?> nPrecIdList = (List <?> ) em.createNativeQuery(
+	      nPrecIdList = (List<Integer> ) em.createNativeQuery(
 	    		  "SELECT np.NID FROM NEIGHBOR_PRECINCT np WHERE np.PRECINCT_PID = ?")
 	          .setParameter(1, pid)
 	          .getResultList();
@@ -170,6 +173,13 @@ public class Precinct {
 	      }
 		}
 		return neighborPrecincts;
+	}
+	
+	public boolean isNeighbor(int precinctId){
+		if(neighborPrecincts.size() == 0){
+			getNeighborPrecinctList();
+		}
+		return nPrecIdList.contains(precinctId);
 	}
 	
 //	public void setNeighborPrecinctList(List<NeighborPrecinct> neighborPrecincts){
