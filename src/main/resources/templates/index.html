@@ -26,6 +26,9 @@
 		function About_onclick() {
 			window.open("about","_self");
 		}
+		function Verify_onclick() {
+			window.open("verify","_self");
+		}
 		function Index_onclick() {
 		    window.open("index","_self");
 		}
@@ -84,6 +87,8 @@
    	 <div class="w3-bar w3-white w3-large">
             <button class="w3-bar-item w3-button w3-yellow w3-mobile" type="submit" onclick="return Index_onclick()"><i class="w3-margin-right"></i> DogOwners</button>
             <button class="w3-bar-item w3-button w3-mobile" type="submit" onclick="return About_onclick()"><i class="w3-margin-right"></i>About Us</button>
+            <button class="w3-bar-item w3-button w3-mobile" type="submit" onclick="return Verify_onclick()"><i class="w3-margin-right"></i>Verify</button>
+            
             <button class="w3-bar-item w3-button w3-mobile" type="submit" onclick="return Feedback_onclick()"><i class="w3-margin-right"></i>Leave Feedback</button>
 	    <div style=" width: 100%;  position: absolute; top: -18px;height: 40px;" th:switch="${login}"> 
   			<p th:case="'no'"><a  class="w3-bar-item w3-button w3-right w3-light-grey w3-mobile w3-margin-right" th:href="@{/login}">Login/Register</a> </p>

@@ -17,13 +17,15 @@ public class User {
 	private String 	address;
 	private String 	password;
 	private String 	phone;
+	private String token;
 
-	public User( String uname, String email, String passwd, String phone, String address) {
+	public User( String uname, String email, String passwd, String phone, String address, String token) {
 		this.password 	=	passwd;
 		this.uname 		= 	uname;
 		this.email 		= 	email;
 		this.phone 		= 	phone;
 		this.address 	= 	address;
+		this.token 		= 	token;
 	}	
 	
 	public User() {
@@ -36,6 +38,14 @@ public class User {
 
 	public void setUname(String uname) {
 		this.uname = uname;
+	}
+	
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
 	}
 
 	public String getPwd() {

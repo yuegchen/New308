@@ -2,6 +2,7 @@ package cse308.Thymeleaf.controller;
 
 import java.io.*;
 import java.util.List;
+import java.util.Random;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -14,11 +15,13 @@ import cse308.Thymeleaf.form.RegisterForm;
 import cse308.Thymeleaf.form.SelectUserForm;
 import cse308.Thymeleaf.model.*;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 @Controller
 public class MainController {
@@ -28,6 +31,9 @@ public class MainController {
 	private static Admin admin=null;
 	private static List<User> userList=null;
 	private static List<Admin> adminList=null;
+	@Autowired
+	private emailController emailC;
+	
 
 	@RequestMapping(value = { "/", "/index" }, method = RequestMethod.GET)
 	public String index(Model model) {
@@ -104,6 +110,12 @@ public class MainController {
 		model.addAttribute("login", login);
 		return "about";
 	}
+	@RequestMapping(value = { "/verify" }, method = RequestMethod.GET)
+	public String showVerifyPage(Model model) {
+		model.addAttribute("user", user);
+		model.addAttribute("login", login);
+		return "verify";
+	}
 	
 	@RequestMapping(value = { "/logout" }, method = RequestMethod.GET)
 	public String logout(Model model) {
@@ -141,6 +153,12 @@ public class MainController {
 
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("Eclipselink_JPA");
 		EntityManager entitymanager = emfactory.createEntityManager();
+		
+		//generate token
+		String token = randomToken.getToken(6);
+		//send email
+		emailC.triggerEmail(email, token);
+		
 		user = new User();
 
 		user.setUname(uname);
@@ -148,7 +166,7 @@ public class MainController {
 		user.setPwd(Encrypt.encrypt(pwd));
 		user.setPhone(phone);
 		user.setAddress(address);
-
+		user.setToken(token);
 		entitymanager.getTransaction().begin();
 		entitymanager.persist(user);
 		entitymanager.getTransaction().commit();
@@ -500,5 +518,16 @@ public class MainController {
 		model.addAttribute("propertyForm", propertyForm2);
 		return "admincenter";
 	}
-	
+	static class randomToken{
+		private static final Random random = new Random();
+		private static final String CHARS = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890!@#$";
+
+		public static String getToken(int length) {
+		    StringBuilder token = new StringBuilder(length);
+		    for (int i = 0; i < length; i++) {
+		        token.append(CHARS.charAt(random.nextInt(CHARS.length())));
+		    }
+		    return token.toString();
+		}
+	}
 }
