@@ -2,6 +2,7 @@ package cse308.Thymeleaf;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -27,34 +28,24 @@ public class RedistrictHelpers {
 		return totalGoodness; 
 	}
 
-	public boolean checkConstraint(Precinct precinct, District d2) {
+	public boolean checkConstraint(Precinct precinct, District d2, Map<Integer, Integer> movedPrecincts) {
 		List<Precinct> neighborPrecinctList = precinct.getNeighborPrecinctList();
-		System.err.println("neighborPrecinctList Size" + neighborPrecinctList.size());
-		System.err.println("Precinct id: " + precinct.getPid());
-		boolean vioContiguity=true;
-		int oid=precinct.getCd();
 		for (Precinct p : neighborPrecinctList) {
-			List<Precinct> tempNeighborPrecinctList = p.getNeighborPrecinctList();
-
-			for(Precinct p2:tempNeighborPrecinctList){
-				if(p2.getPid() == precinct.getPid()){
-					p2.setCd(d2.getDId());
-					
-				}
-				if(p2.getCd()==p.getCd()){
-					vioContiguity=false;
-				}
-			}
-			if(vioContiguity){
-				return false;
+			if(movedPrecincts.containsKey(p.getPid())){
+				p.setCd(movedPrecincts.get(p.getPid()));
 			}
 			if (p != null && p.getCd()==d2.getDId()) {
-				System.out.println("true");
-				precinct.setCd(oid);
 				return true;
 			}
-			
-			
+			List<Precinct> tempNeighborPrecinctList = p.getNeighborPrecinctList();
+			for(Precinct p2:tempNeighborPrecinctList){
+				if(movedPrecincts.containsKey(p2.getPid())){
+					p2.setCd(movedPrecincts.get(p2.getPid()));
+				}
+				if(p2.getCd()==p.getCd()){
+					return true;
+				}
+			}
 		}
 		return false;
 	}
@@ -81,8 +72,6 @@ public class RedistrictHelpers {
 		if(!out){
 			List<Integer> intoPList = d2.getIntoPList();
 			System.out.println("intoPList size: "+intoPList.size());
-			
-			
 			intoPList.add(precinct.getPid());
 			d2.setIntoPList(intoPList);
 		}

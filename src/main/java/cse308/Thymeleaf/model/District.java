@@ -47,7 +47,11 @@ public class District {
     
     @Transient
     private List <Precinct> precinctList = new ArrayList <Precinct> (); //store precincts with their id
-
+    
+    @Transient
+    private List <Integer> nDistIdList = new ArrayList<Integer>();
+    @Transient
+    private List <District> nDistList = new ArrayList<District>();
 
     public District(int districtId, int stateId, List<Integer> inprecinctList, List <Precinct> borderingPrecinctList) {
         this.districtId = districtId;
@@ -60,7 +64,6 @@ public class District {
         this.districtId = districtId;
         this.stateId = stateId;
         System.out.println("districtId: " + districtId);
-        
         this.precinctList = initPrecList();
         this.borderingPrecinctList = initBorderingPrecinctList();
     }
@@ -77,22 +80,30 @@ public class District {
 		this.movedIntoPrecinctList=pList;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List<District> getNeighborDistricts(){
-	  EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
-	  EntityManager em = emf.createEntityManager();
-      List <?> nDistIdList = (List <?> ) em.createNativeQuery(
-    		  "SELECT nd.NDISTRICTID FROM NEIGHBOR_DISTRICT nd WHERE nd.DISTRICT_CD = ?1"
-    		  + " AND nd.SID = ?2")
-          .setParameter(1, districtId)
-          .setParameter(2, stateId)
-          .getResultList();
-      
-      List <District> nDistList = new ArrayList<District>();
-      for (int i = 0; i < nDistIdList.size(); i++) {
-          District district = new District((int)nDistIdList.get(i), stateId);
-          nDistList.add(district);
-      }
+	  if(nDistList.size() == 0){
+		  EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
+		  EntityManager em = emf.createEntityManager();
+	      nDistIdList = (List<Integer> ) em.createNativeQuery(
+	    		  "SELECT nd.NDISTRICTID FROM NEIGHBOR_DISTRICT nd WHERE nd.DISTRICT_CD = ?1"
+	    		  + " AND nd.SID = ?2")
+	          .setParameter(1, districtId)
+	          .setParameter(2, stateId)
+	          .getResultList();
+	      
+	      for (int i = 0; i < nDistIdList.size(); i++) {
+	          District district = new District(nDistIdList.get(i), stateId);
+	          nDistList.add(district);
+	      }
+	  }
       return nDistList;
+	}
+	
+	public boolean isNeighbor(int districtId){
+		if(nDistIdList.size() == 0)
+			getNeighborDistricts();
+		return nDistIdList.contains(districtId);
 	}
 	
 //  @OneToMany(mappedBy = "district", cascade = CascadeType.ALL)
