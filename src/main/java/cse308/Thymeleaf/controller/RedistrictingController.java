@@ -61,6 +61,16 @@ public class RedistrictingController {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("Eclipselink_JPA");
 		EntityManager entitymanager = emfactory.createEntityManager();
 		state = entitymanager.find(State.class, 27);
+		//web statistics
+		entitymanager.getTransaction().begin(); 
+		Statistics stat = entitymanager.find(Statistics.class, 1);
+		if(state.getStateId()==9)
+			stat.setConnecticut(stat.getConnecticut()+1);
+		else if(state.getStateId()==25)
+			stat.setMassachusetts(stat.getMassachusetts()+1);
+		else
+			stat.setMinnesota(stat.getMinnesota()+1);;
+		entitymanager.getTransaction().commit();
 		
 		List<District> dList = state.initDistList();
 		
