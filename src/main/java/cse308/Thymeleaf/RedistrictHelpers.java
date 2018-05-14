@@ -1,22 +1,13 @@
 package cse308.Thymeleaf;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-
-import cse308.Thymeleaf.form.RedistrictingForm;
 import cse308.Thymeleaf.model.District;
-import cse308.Thymeleaf.model.Plan;
 import cse308.Thymeleaf.model.Precinct;
 import cse308.Thymeleaf.model.State;
 
@@ -42,16 +33,19 @@ public class RedistrictHelpers {
 		System.err.println("Precinct id: " + precinct.getPid());
 		boolean vioContiguity=true;
 		int oid=precinct.getCd();
-		precinct.setCd(d2.getDId());
 		for (Precinct p : neighborPrecinctList) {
 			List<Precinct> tempNeighborPrecinctList = p.getNeighborPrecinctList();
+
 			for(Precinct p2:tempNeighborPrecinctList){
+				if(p2.getPid() == precinct.getPid()){
+					p2.setCd(d2.getDId());
+					
+				}
 				if(p2.getCd()==p.getCd()){
 					vioContiguity=false;
 				}
 			}
 			if(vioContiguity){
-				precinct.setCd(oid);
 				return false;
 			}
 			if (p != null && p.getCd()==d2.getDId()) {
