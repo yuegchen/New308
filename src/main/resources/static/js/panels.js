@@ -101,6 +101,9 @@ function setMode(evt, mode) {
                 });
                 redraw();
             },
+            error: function (){
+                console.log("Error");
+            },
             data: params
         });
     }

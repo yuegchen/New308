@@ -18,13 +18,14 @@ public class NeighborDistrict {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private		int			id;
-	
 	private		int			nDistrictId;
 	private		District	district;
+	private		int			sid;
 	
-	public NeighborDistrict(int nDistrictId, District district) {
+	public NeighborDistrict(int nDistrictId, District district, int sid) {
 		this.nDistrictId = nDistrictId;
 		this.district = district;
+		this.sid = sid;
 	}
 	
 	public NeighborDistrict(){
@@ -39,13 +40,21 @@ public class NeighborDistrict {
 		this.nDistrictId = nDistrictId;
 	}
 	
+	public int getSid(){
+		return sid;
+	}
+	
+	public void setSid(int sid){
+		this.sid = sid;
+	}
+	
     @ManyToOne
     @JoinColumn(name = "DISTRICT_DISTRICTID")
     public District getComparingDistrict() {
         return district;
     }
     
-    public void setComparingPrecinct(District district){
+    public void setComparingDistrict(District district){
     	this.district = district;
     }
 }

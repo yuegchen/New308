@@ -31,54 +31,27 @@ public class Precinct {
 	@Id
 	private 	int 		pid;
 	private 	String 		name;
-	private 	int 	cd;
+	private 	int 		cd;
+	private		int			sid;
 	private		double		area;
+	private 	int 		population;
+	private 	double 		dem;
+	private 	double 		rep;
 	
-//	private		District	district;
-	private List<NeighborPrecinct> neighborPrecincts;
-	//add
-	private int population;
-	private double dem;
-	private double rep;
-	private int sid;
+	@Transient
+	private List<Precinct> neighborPrecincts = new ArrayList<Precinct> ();
 	
-	public double getDem() {
-		return dem;
-	}
-
-	public void setDem(double dem) {
-		this.dem = dem;
-	}
 	
-	public double getRep() {
-		return rep;
-	}
-
-	public void setRep(double rep) {
-		this.rep = rep;
-	}
-	
-	public int getPopulation() {
-		return population;
-	}
-
-	public void setPopulation(int population) {
-		this.population = population;
-	}
-	
-	public int getSid() {
-		return sid;
-	}
-
-	public void setSid(int sid) {
-		this.sid = sid;
-	}//end
-	
-	public Precinct(int pid, String name, int cd, int area) {
+	public Precinct(int pid, String name, int cd, double area, int sid, int population, 
+			double dem, double rep) {
 		this.pid = pid;
 		this.name = name;
 		this.cd = cd;
 		this.area = area;
+		this.sid = sid;
+		this.population = population;
+		this.dem = dem;
+		this.rep = rep;
 	}
 	
 	public Precinct(){
@@ -109,6 +82,37 @@ public class Precinct {
 		this.cd = cd;
 	}
 	
+	public int getSid(){
+		return sid;
+	}
+	
+	public void setSid(int sid){
+		this.sid = sid;
+	}
+	
+	public double getDem() {
+		return dem;
+	}
+
+	public void setDem(double dem) {
+		this.dem = dem;
+	}
+	
+	public double getRep() {
+		return rep;
+	}
+
+	public void setRep(double rep) {
+		this.rep = rep;
+	}
+	
+	public int getPopulation() {
+		return population;
+	}
+
+	public void setPopulation(int population) {
+		this.population = population;
+	}
 //    @ManyToOne
 //    @JoinColumn(name = "CD")
 //	public District getDistrict(){
@@ -127,6 +131,8 @@ public class Precinct {
 
 	
 	public double initArea() throws IOException{
+		System.out.println("sid " + sid);
+		
 		double tempArea = 0;
 		EntityManagerFactory	emf				=	Persistence.createEntityManagerFactory("Eclipselink_JPA");
 		EntityManager			em				=	emf.createEntityManager();
@@ -135,18 +141,20 @@ public class Precinct {
 		em.getTransaction().begin();
 		Query query = em
 				.createQuery("UPDATE Precinct p SET p.area = :tempArea "
-				+ "WHERE p.pid= :pid");
+				+ "WHERE p.pid= :pid AND p.sid = :sid");
 		query.setParameter("tempArea", tempArea);
 		query.setParameter("pid", pid);
+		query.setParameter("sid", sid);
 		query.executeUpdate();
 		em.getTransaction().commit();
 		em.close();
 		
 		return tempArea;
-	}
+	} 
 
 //	@OneToMany(mappedBy = "precinct", cascade = CascadeType.ALL)
 	public List<Precinct> getNeighborPrecinctList(){
+		if(neighborPrecincts.size() == 0){
 		  EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
 		  EntityManager em = emf.createEntityManager();
 	      List <?> nPrecIdList = (List <?> ) em.createNativeQuery(
@@ -154,16 +162,18 @@ public class Precinct {
 	          .setParameter(1, pid)
 	          .getResultList();
 	      
-	      List <Precinct> nPrecList = new ArrayList<Precinct>();
 	      for (int i = 0; i < nPrecIdList.size(); i++) {
-	          Precinct precinct = em.find(Precinct.class, (int) nPrecIdList.get(i));
-	          nPrecList.add(precinct);
+	    	  if((int)nPrecIdList.get(i) < 999999900){
+	    		  Precinct precinct = em.find(Precinct.class, (int) nPrecIdList.get(i));
+	        	  neighborPrecincts.add(precinct);
+	    	  }
 	      }
-	      return nPrecList;
 		}
-	
-	public void setNeighborPrecinctList(List<NeighborPrecinct> neighborPrecincts){
-		this.neighborPrecincts = neighborPrecincts;
+		return neighborPrecincts;
 	}
+	
+//	public void setNeighborPrecinctList(List<NeighborPrecinct> neighborPrecincts){
+//		this.neighborPrecincts = neighborPrecincts;
+//	}
 
 }

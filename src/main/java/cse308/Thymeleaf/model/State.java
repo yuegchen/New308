@@ -11,6 +11,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -27,7 +28,8 @@ public class State {
 	private 	int 		stateId;
 	private 	String 		stateName;
 
-	private 	List<District> 		districtList = new ArrayList<District>(); 
+	@Transient
+	private 	List<District> 		distList = new ArrayList<District>(); 
 	
 	public 		static		final		int		MAX_STATE_ID_INITIAL = 999999999;
 	
@@ -38,8 +40,7 @@ public class State {
 	//Test Use
 	public State(int stateId){
 		this.stateId = stateId;
-		this.districtList = initDistList();
-		
+		initDistList();
 	}
 	
 	public State() {
@@ -118,7 +119,7 @@ public class State {
 			String storedBorderIds = Integer.toString(nPrecInNDistrict.getCd()) + " " + Integer.toString(district.getDId());
 			if(storedBorderIdList.indexOf(storedBorderIds) == -1){
 				storedBorderIdList.add(storedBorderIds);
-				em.persist(new NeighborDistrict(nPrecInNDistrict.getCd(), district));
+				em.persist(new NeighborDistrict(nPrecInNDistrict.getCd(), district, stateId));
 			}
 		}
 		em.getTransaction().commit();
@@ -130,7 +131,7 @@ public class State {
 		for(int i = 0; i < stateBorderPrecinctIds.size(); i++){
 			
 			Precinct precinct = em.find(Precinct.class, (int)stateBorderPrecinctIds.get(i));
-			District district = em.find(District.class, precinct.getCd());
+			District district = new District(precinct.getCd(), stateId);
 			if(storedPrecinctIdList.indexOf(precinct.getPid()) == -1){
 				em.persist(new BorderingPrecinct(precinct, district));
 			}
@@ -153,6 +154,7 @@ public class State {
 //	}
 
 	 public List <District> initDistList() { 
+		if(distList.size() == 0){
 	        EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
 	        EntityManager em = emf.createEntityManager();
 	        
@@ -161,18 +163,15 @@ public class State {
 	            .setParameter(1, this.stateId)
 	            .getResultList();
 	        
-	        List <District> distList = new ArrayList<District>();
-	        for (int i = 0; i < distIdList.size(); i++) {
-	        	distList.add(em.find(District.class, (int) distIdList.get(i)));
-	        }
 	        
-	        return distList;
-	    }
+	        for (int i = 0; i < distIdList.size(); i++) {
+	        	distList.add(new District((int) distIdList.get(i), stateId));
+	        }
+		}
+        return distList;
+    }
     
-	public List<District> getDistList(){
-		return districtList;
-	}
     public void setDistList(List<District> distList){
-    	this.districtList=distList;
+    	this.distList=distList;
     }
 }
