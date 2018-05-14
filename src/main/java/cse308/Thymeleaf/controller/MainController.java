@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.gson.Gson;
+
 @Controller
 public class MainController {
 
@@ -518,6 +520,7 @@ public class MainController {
 		model.addAttribute("propertyForm", propertyForm2);
 		return "admincenter";
 	}
+
 	static class randomToken{
 		private static final Random random = new Random();
 		private static final String CHARS = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890!@#$";
@@ -530,4 +533,30 @@ public class MainController {
 		    return token.toString();
 		}
 	}
+
+	
+	@RequestMapping(value = {"/dataInitialization"}, method = RequestMethod.GET)
+	public String initData(){
+		State state = new State(27);
+		List<District> districts = state.initDistList();
+		System.out.println("Started");
+		
+		for(District district: districts){
+			System.err.println(district.getDId());
+			List<Precinct> precincts = district.initPrecList();
+			for(Precinct precinct: precincts){
+				System.err.println(precinct.getPid());
+				try {
+					System.out.println(precinct.initArea());
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		return new Gson().toJson("{'state' : 'okay'}");
+		
+	}
+	
+
 }

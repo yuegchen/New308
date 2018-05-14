@@ -2,9 +2,10 @@ package cse308.Thymeleaf.model;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
@@ -12,7 +13,6 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.Persistence;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -32,8 +32,11 @@ import cse308.Thymeleaf.model.Type;
 public class District {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Id
+    private int id;
+    
     @Column(name = "CD")
     private int districtId;
+    private int stateId;
     
     @Transient
     private List<Integer> movedIntoPrecinctList= new ArrayList <Integer>(); //store precincts with their id
@@ -44,16 +47,19 @@ public class District {
     @Transient
     private List <Precinct> precinctList = new ArrayList <Precinct> (); //store precincts with their id
 
-    private int stateId = 27;
 
-    public District(int districtId, List<Integer> inprecinctList, List <Precinct> borderingPrecinctList) {
+    public District(int districtId, int stateId, List<Integer> inprecinctList, List <Precinct> borderingPrecinctList) {
         this.districtId = districtId;
+        this.stateId = stateId;
         this.movedIntoPrecinctList = inprecinctList;
         this.borderingPrecinctList = borderingPrecinctList;
     }
 
-    public District(int districtId) {
+    public District(int districtId, int stateId) {
         this.districtId = districtId;
+        this.stateId = stateId;
+        System.out.println("districtId: " + districtId);
+        
         this.precinctList = initPrecList();
         this.borderingPrecinctList = initBorderingPrecinctList();
     }
@@ -82,9 +88,8 @@ public class District {
       
       List <District> nDistList = new ArrayList<District>();
       for (int i = 0; i < nDistIdList.size(); i++) {
-    	  System.out.println("N Dist Id: " + nDistIdList.get(i));
-          District precinct = em.find(District.class, (int) nDistIdList.get(i));
-          nDistList.add(precinct);
+          District district = new District((int)nDistIdList.get(i), stateId);
+          nDistList.add(district);
       }
       return nDistList;
 	}
@@ -117,6 +122,14 @@ public class District {
   	this.borderingPrecinctList = bPrecinctList;
   }
 
+  	public int getId(){
+  		return id;
+  	}
+  	
+  	public void setId(int id){
+  		this.id = id;
+  	}
+  	
 	public int getDId() {
 		return districtId;
 	}
@@ -189,27 +202,35 @@ public class District {
 		double districtPerimeter = 0.0;
 		GeometryJSON			geometryJson	=	new GeometryJSON();
 		GeometryPrecisionReducer gpr			=	new GeometryPrecisionReducer(new PrecisionModel(10));
-		List<?>				districtBorderPrecinctIds		=	(List<?>) em.createQuery(
-				"SELECT p1.pid, p2.pid FROM Precinct p1, Precinct p2, NeighborPrecinct np WHERE (p1.pid = np.precinct.pid) AND (p2.pid = " + 
-				"np.nid AND p1.cd != p2.cd) AND (p1.cd = :cd) AND (p1.sid = :sid)")
-				.setParameter("cd", districtId)
-				.setParameter("sid", stateId)
-				.getResultList();
+		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+		for(Precinct precinct: borderingPrecinctList){
+			List<Precinct> neighborPrecincts = precinct.getNeighborPrecinctList();
+			for(Precinct nPrecinct: neighborPrecincts){
+				
+				map.put(nPrecinct.getPid(), precinct.getPid());
+			}
+		}
+//		List<?>				districtBorderPrecinctIds		=	(List<?>) em.createQuery(
+//				"SELECT p1.pid, p2.pid FROM Precinct p1, Precinct p2, NeighborPrecinct np WHERE (p1.pid = np.precinct.pid) AND (p2.pid = " + 
+//				"np.nid AND p1.cd != p2.cd) AND (p1.cd = :cd) AND (p1.sid = :sid)")
+//				.setParameter("cd", districtId)
+//				.setParameter("sid", stateId)
+//				.getResultList();
 		
-		for(int i = 0; i < districtBorderPrecinctIds.size(); i++){
-			PrecinctGeometry precBound = em.find(PrecinctGeometry.class, ((Integer)((Object[]) districtBorderPrecinctIds.get(i))[0]));
-			PrecinctGeometry neighborPrecBound = em.find(PrecinctGeometry.class, ((Integer)((Object[]) districtBorderPrecinctIds.get(i))[1]));
+//		List<?> 			stateBorderPrecinctIds			=	(List<?>) em.createQuery(
+//				"SELECT p.pid FROM Precinct p, NeighborPrecinct np WHERE (p.pid = np.precinct.pid) AND (np.nid = :stateId) AND (p.cd = :cd)")
+//				.setParameter("stateId", State.MAX_STATE_ID_INITIAL-stateId)
+//				.setParameter("cd", districtId)
+//				.getResultList();
+		
+		for(Map.Entry<Integer, Integer> districtBorderPrecinctIds: map.entrySet()){
+			PrecinctGeometry precBound = em.find(PrecinctGeometry.class, districtBorderPrecinctIds.getValue());
+			PrecinctGeometry neighborPrecBound = em.find(PrecinctGeometry.class, districtBorderPrecinctIds.getKey());
 			districtPerimeter += getDistBorderPrecBoundIntPerimter(precBound, neighborPrecBound, geometryJson, gpr);
 		}
-		
-		List<?> 			stateBorderPrecinctIds			=	(List<?>) em.createQuery(
-				"SELECT p.pid FROM Precinct p, NeighborPrecinct np WHERE (p.pid = np.precinct.pid) AND (np.nid = :stateId) AND (p.cd = :cd)")
-				.setParameter("stateId", State.MAX_STATE_ID_INITIAL-stateId)
-				.setParameter("cd", districtId)
-				.getResultList();
 		StateGeometry stateBorder = em.find(StateGeometry.class, stateId);
-		for(int i = 0; i < stateBorderPrecinctIds.size(); i++){
-			PrecinctGeometry precBound = em.find(PrecinctGeometry.class, ((Integer)((Object[]) districtBorderPrecinctIds.get(i))[0]));
+		for(int i = 0; i < borderingPrecinctList.size(); i++){
+			PrecinctGeometry precBound = em.find(PrecinctGeometry.class, borderingPrecinctList.get(i).getPid());
 			districtPerimeter += getStateBorderPrecBoundIntPerimeter(precBound, stateBorder, geometryJson, gpr);
 		}
 		em.close();

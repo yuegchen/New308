@@ -39,6 +39,8 @@ public class State {
 	}
 	//Test Use
 	public State(int stateId){
+		this.stateId = stateId;
+		initDistList();
 	}
 	
 	public State() {
@@ -117,7 +119,7 @@ public class State {
 			String storedBorderIds = Integer.toString(nPrecInNDistrict.getCd()) + " " + Integer.toString(district.getDId());
 			if(storedBorderIdList.indexOf(storedBorderIds) == -1){
 				storedBorderIdList.add(storedBorderIds);
-				em.persist(new NeighborDistrict(nPrecInNDistrict.getCd(), district));
+				em.persist(new NeighborDistrict(nPrecInNDistrict.getCd(), district, stateId));
 			}
 		}
 		em.getTransaction().commit();
@@ -129,7 +131,7 @@ public class State {
 		for(int i = 0; i < stateBorderPrecinctIds.size(); i++){
 			
 			Precinct precinct = em.find(Precinct.class, (int)stateBorderPrecinctIds.get(i));
-			District district = em.find(District.class, precinct.getCd());
+			District district = new District(precinct.getCd(), stateId);
 			if(storedPrecinctIdList.indexOf(precinct.getPid()) == -1){
 				em.persist(new BorderingPrecinct(precinct, district));
 			}
@@ -161,9 +163,9 @@ public class State {
 	            .setParameter(1, this.stateId)
 	            .getResultList();
 	        
-	        List <District> distList = new ArrayList<District>();
+	        
 	        for (int i = 0; i < distIdList.size(); i++) {
-	        	distList.add(em.find(District.class, (int) distIdList.get(i)));
+	        	distList.add(new District((int) distIdList.get(i), stateId));
 	        }
 		}
         return distList;

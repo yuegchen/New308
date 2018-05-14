@@ -9,11 +9,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import org.apache.catalina.core.ApplicationContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.task.AsyncTaskExecutor;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -25,6 +24,7 @@ import org.springframework.stereotype.Controller;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 
+import cse308.Thymeleaf.ExternalProperties;
 import cse308.Thymeleaf.RecoloringOption;
 import cse308.Thymeleaf.RedistrictHelpers;
 import cse308.Thymeleaf.model.District;
@@ -51,10 +51,10 @@ public class RedistrictController {
 		Map requestJson = gson.fromJson(request, Map.class);
 		try{
 			String requestType = requestJson.get("request").toString().toUpperCase();
-			stateId = Integer.parseInt(requestJson.get("stateId").toString());
-			weights = gson.fromJson(requestJson.get("weights").toString(), double[].class);
 			switch(RecoloringOption.valueOf(requestType)){
 				case START:
+					stateId = (int) Double.parseDouble(requestJson.get("stateId").toString());
+					weights = gson.fromJson(requestJson.get("weights").toString(), double[].class);
 					endingCondition = true;
 					this.te.execute(new RedistrictingThread());
 					break;
@@ -86,17 +86,24 @@ public class RedistrictController {
 	@Component
 	@Scope("prototype")
 	public class RedistrictingThread implements Runnable{
-		RedistrictHelpers rh = new RedistrictHelpers();
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
-		EntityManager em = emf.createEntityManager();		
+		private RedistrictHelpers rh = new RedistrictHelpers();
+		private EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
+		private EntityManager em = emf.createEntityManager();	
+		private int	steps = 0;
+		private int nonSteps = 0;
+
 		@Override
 		public void run(){
 			while(endingCondition){
 				try {
+					ExternalProperties ep = new ExternalProperties();
+					int maxMoves = ep.getMaxMoves();
+					int maxNonImprovedSteps = ep.getNonImprovedSteps();
+
 					List<District> districts = rh.getDistrictsByState(stateId, em);
 
 					end_redistricting:
-					if(endingCondition){
+					if(steps < maxMoves && nonSteps < maxNonImprovedSteps){
 						for(District district:districts){
 							List<Precinct> borderPrecincts = district.initBorderingPrecinctList();
 							List<District> neighborDistricts = district.getNeighborDistricts();
@@ -105,10 +112,17 @@ public class RedistrictController {
 								while(isPaused){
 									Thread.sleep(1000);
 								}
-								if(endingCondition){
+								if(steps >= maxMoves){
+									System.err.println("steps exceeds MAX_MOVES");
+									break end_redistricting;
+								}
+								if(nonSteps >= maxNonImprovedSteps){
+									System.err.println("non-steps exceeds MAX_NON_IMPROVED_STEPS");
 									break end_redistricting;
 								}
 								tryMove(borderPrecincts,district,to);
+								System.err.println("______________________");
+								Thread.sleep(2000);
 							}
 						}
 					}
@@ -122,32 +136,29 @@ public class RedistrictController {
 			}
 		}
 
-		private void tryMove(List<Precinct> borderPrecincts, District fromDistrict, District toDistrict) throws IOException {
-			double originalScore = rh.calculateGoodness(fromDistrict, weights) + rh.calculateGoodness(toDistrict, weights);
-			List<Precinct> tempBorderPList = new ArrayList<Precinct>();
-			for(Precinct precinct : borderPrecincts){
+		private void tryMove(List<Precinct> borderPrecinctList,District fromDistrict, District toDistrict) throws IOException {
+			double originalScore=rh.calculateGoodness(fromDistrict, toDistrict, weights);
+			System.out.println("originalScore: "+originalScore);
+			List<Precinct> tempBorderPList=new ArrayList<Precinct>();
+			for(Precinct precinct : borderPrecinctList){
 				tempBorderPList.add(precinct);
 			}
 			for (Precinct precinct : tempBorderPList) {
 				if(rh.checkConstraint(precinct,toDistrict)){
-					smt.convertAndSend("/redistrict/reply", new JsonParser()
-						.parse(rh.moveTo(precinct, fromDistrict, toDistrict, false))
-						.getAsJsonObject());
-					
+					smt.convertAndSend("/redistrict/reply", rh.moveTo(precinct, fromDistrict, toDistrict, false));
 					steps++;
-				}
+				} 
 				else
 					continue;
-				double newScore = rh.calculateGoodness(fromDistrict, weights) + rh.calculateGoodness(toDistrict, weights);
+				double newScore=rh.calculateGoodness(fromDistrict,toDistrict, weights);
+				System.out.println("new Score: "+newScore);
 				if (newScore > originalScore) {
-					originalScore = newScore;
-					non_steps = 0;
+					originalScore=newScore;
+					nonSteps=0;
 				}
 				else{
-					non_steps++;
-					smt.convertAndSend("/redistrict/reply", new JsonParser()
-						.parse(rh.moveTo(precinct, toDistrict, fromDistrict, false))
-						.getAsJsonObject());
+					nonSteps++;
+					smt.convertAndSend("/redistrict/reply", rh.moveTo(precinct, toDistrict, fromDistrict, false)); 
 				}
 			}
 		}
