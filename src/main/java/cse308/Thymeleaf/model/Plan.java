@@ -20,6 +20,8 @@ public class Plan {
 	private 	State 	state;
 	private 	String 	email;
 	
+	
+	
 	public Plan( int pid, String d, String stateName, State state, String email) {
 		this.planId= pid;
 		this.creationDate = d;
