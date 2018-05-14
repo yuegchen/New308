@@ -118,6 +118,19 @@ public class MainController {
 		model.addAttribute("login", login);
 		return "verify";
 	}
+	@RequestMapping(value = { "/viewStatistics" }, method = RequestMethod.GET)
+	public String showViewStatisticsPage(Model model) {
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("Eclipselink_JPA");
+		EntityManager entitymanager = emfactory.createEntityManager();
+		
+		Statistics s = entitymanager.find(Statistics.class, 1);
+		model.addAttribute("s", s);
+		model.addAttribute("user", user);
+		model.addAttribute("login", login);
+		entitymanager.close();
+		emfactory.close();
+		return "viewStatistics";
+	}
 	
 	@RequestMapping(value = { "/logout" }, method = RequestMethod.GET)
 	public String logout(Model model) {
