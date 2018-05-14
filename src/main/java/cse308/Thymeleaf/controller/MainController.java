@@ -118,6 +118,12 @@ public class MainController {
 		model.addAttribute("login", login);
 		return "verify";
 	}
+	@RequestMapping(value = { "/viewStatistics" }, method = RequestMethod.GET)
+	public String showViewStatisticsPage(Model model) {
+		model.addAttribute("user", user);
+		model.addAttribute("login", login);
+		return "viewStatistics";
+	}
 	
 	@RequestMapping(value = { "/logout" }, method = RequestMethod.GET)
 	public String logout(Model model) {
