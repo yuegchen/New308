@@ -105,10 +105,16 @@ public class RedistrictHelpers {
 	
 	public double calculateCompactness(District d, double weight) throws IOException {
 		double perimeter = d.getPerimeter();
+		System.err.println("Perimeter: "+perimeter);
+		if(perimeter==0){
+			return 0;
+		}
 		double area = d.getArea();
+		System.err.println("Area: "+area);
 		double r = Math.sqrt(area / Math.PI);
 		double equalAreaPerimeter = 2 * Math.PI * r;
 		double score = 1 / (perimeter / equalAreaPerimeter);
+		System.err.println("score: "+score*weight);
 		return score*weight;
 	}
 
