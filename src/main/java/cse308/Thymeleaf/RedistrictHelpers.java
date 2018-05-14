@@ -41,7 +41,8 @@ public class RedistrictHelpers {
 		System.err.println("neighborPrecinctList Size" + neighborPrecinctList.size());
 		System.err.println("Precinct id: " + precinct.getPid());
 		boolean vioContiguity=true;
-		
+		int oid=precinct.getCd();
+		precinct.setCd(d2.getDId());
 		for (Precinct p : neighborPrecinctList) {
 			List<Precinct> tempNeighborPrecinctList = p.getNeighborPrecinctList();
 			for(Precinct p2:tempNeighborPrecinctList){
@@ -49,11 +50,13 @@ public class RedistrictHelpers {
 					vioContiguity=false;
 				}
 			}
-			if(vioContiguity)
+			if(vioContiguity){
+				precinct.setCd(oid);
 				return false;
-			
+			}
 			if (p != null && p.getCd()==d2.getDId()) {
 				System.out.println("true");
+				precinct.setCd(oid);
 				return true;
 			}
 			
