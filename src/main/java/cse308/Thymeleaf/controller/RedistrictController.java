@@ -232,7 +232,7 @@ public class RedistrictController {
 //					fromDistrict.setEfficiencyGap(1-rh.calculatePoliticalFairness(fromDistrict, 1));
 //					toDistrict.setCompactness(1-rh.calculatePoliticalFairness(toDistrict, 1));
 					originalScore=newScore;
-					int i = rand.nextInt(4)+3;
+					int i = rand.nextInt(4)+2;
 					lastGood=steps+i;
 					nonSteps=0;
 				}

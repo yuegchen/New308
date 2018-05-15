@@ -131,11 +131,17 @@ public class MainController {
 
 		if (user.getToken().compareTo(token) == 0 ) {
 			//success
-			return "UserCenter"
+			login="yes";
+			model.addAttribute("user", user);
+			model.addAttribute("login", login);
+			return "UserCenter";
 			
 		} else {
 			//fail
-			return "UserCenter"
+			login="yes";
+			model.addAttribute("user", user);
+			model.addAttribute("login", login);
+			return "UserCenter";
 		}
 		
 		

@@ -111,7 +111,8 @@ public class RedistrictHelpers {
 		System.err.println("Area: "+area);
 		double r = Math.sqrt(area / Math.PI);
 		double equalAreaPerimeter = 2 * Math.PI * r;
-		double score = 1 / (perimeter / equalAreaPerimeter);
+//		double score = 1 / (perimeter / equalAreaPerimeter);
+		double score=(4 * Math.PI * area) / Math.pow(perimeter, 2);
 		System.err.println("score: "+score*weight);
 		return score*weight;
 	}
