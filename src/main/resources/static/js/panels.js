@@ -61,7 +61,14 @@ function setMode(evt, mode) {
         var a = $('<a></a>').attr('href', '#');
         header.append(h1, a);
 
-        var divContainer = $('<div></div>').addClass('')
+        var divContainer = $('<div></div>').addClass('cd-panel__container');
+        var divContent = $('<div></div>').addClass('cd-panel__content');
+        var table1 = $('<table></table>').addClass('table table-striped').attr('id', 'state-table1');
+        var table2 = $('<table></table>').addClass('table table-striped').attr('id', 'state-table2');
+        divContent.append(table1, table2);
+        divContainer.append(divContent);
+
+        div.append(header, divContainer);
     }
 
     function getDistrictDisplay() {
@@ -91,32 +98,20 @@ function setMode(evt, mode) {
         document.getElementById("dsb" + district).style.display.className += " active"
     }
 
-    function redistricting(stateId, weights) {
+    function compare(){
         var params = {
-            stateId: stateId,
-            weights: weights
-        };
+            stateId1: $('#select_state_1 option:selected').text();
+            stateId2: $('#select_state_2 option:selected').text();
+        }
 
         $.ajax({
-            url: 'redistrict',
-            type: 'POST',
+            url: 'compare-state',
+            type: 'GET',
             dataType: 'json',
-            success: function(response) {
-                console.log(response.plan.state);
-                var dList = response.plan.state.dList;
-                dList.forEach(function(district) {
-                    if (district.precinctList != null) {
-                        district.precinctList.forEach(function(changedPrecinct) {
-                            setPrecinctDistrict(changedPrecinct, district.districtNameId);
-                        });
-                    }
-                });
-                redraw();
-            },
-            error: function (){
-                console.log("Error");
-            },
+            success: function(response){
+
+            }
             data: params
-        });
+        })
     }
 }

@@ -10,6 +10,9 @@ import org.geotools.geojson.geom.GeometryJSON;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.PrecisionModel;
+import com.vividsolutions.jts.geom.TopologyException;
+import com.vividsolutions.jts.precision.GeometryPrecisionReducer;
 
 import cse308.Thymeleaf.model.Type;
 
@@ -19,8 +22,8 @@ public class StateGeometry {
 	
 	@Id
 	private int sid;
-	
 	private String coordinates;
+	private String type;
 	
 	public int getSid(){
 		return sid;
@@ -30,24 +33,64 @@ public class StateGeometry {
 		return coordinates;
 	}
 	
-	public static Polygon getStateGeometry(StateGeometry stateGeometry, GeometryJSON geometryJson) throws IOException{
-		return geometryJson.readPolygon(new String("{\"type\":\"Polygon\", \"coordinates\":" + stateGeometry.getCoordinates() + "}"));
+	public String getType(){
+		return type.toUpperCase();
+	}
+	
+	public static Geometry getStateGeometry(StateGeometry stateGeometry, GeometryJSON geometryJson) throws IOException{
+		Geometry geometry;
+		if (Type.valueOf(stateGeometry.getType()).equals(Type.POLYGON)){
+			geometry = geometryJson.readPolygon(new String("{\"type\":\"Polygon\", \"coordinates\":" + stateGeometry.getCoordinates() + "}"));
+			
+		}else{
+			geometry = geometryJson.readMultiPolygon(new String("{\"type\":\"MultiPolygon\", \"coordinates\":" + stateGeometry.getCoordinates() + "}"));
+		}
+		return geometry;
 	}
 	
 	
-	public static boolean intersects(Polygon statePolygon, Geometry precinctPolygon){
-		try{
-			if(Type.valueOf(precinctPolygon.getGeometryType().toUpperCase()) == Type.MULTIPOLYGON){
-				for(int i = 0; i < precinctPolygon.getNumGeometries(); i++){
-					if(statePolygon.getExteriorRing().intersects(((Polygon)precinctPolygon.getGeometryN(i)).getExteriorRing())){
-						return true;
+	public static boolean intersects(Geometry statePolygon, Geometry precinctPolygon){
+		double precisionLevel = 10000;
+		boolean isTopoExceptioned;
+		do{
+			try{
+				if(Type.valueOf(precinctPolygon.getGeometryType().toUpperCase()) == Type.MULTIPOLYGON &&
+						Type.valueOf(statePolygon.getGeometryType().toUpperCase()) == Type.MULTIPOLYGON ){
+					for(int i = 0; i < statePolygon.getNumGeometries(); i++){
+						for(int j = 0; j < precinctPolygon.getNumGeometries(); j++)
+							if(GeometryPrecisionReducer.reduce(((Polygon)statePolygon.getGeometryN(i)).getExteriorRing(), 
+									new PrecisionModel(precisionLevel)).intersects(
+											GeometryPrecisionReducer.reduce(((Polygon)precinctPolygon.getGeometryN(j)).getExteriorRing(), 
+													new PrecisionModel(precisionLevel)))){
+								return true;
+						}
 					}
+					return false;
+				}else if(Type.valueOf(precinctPolygon.getGeometryType().toUpperCase()) == Type.MULTIPOLYGON){
+					for(int j = 0; j < precinctPolygon.getNumGeometries(); j++)
+						if(GeometryPrecisionReducer.reduce(((Polygon)statePolygon).getExteriorRing(), new PrecisionModel(precisionLevel))
+								.intersects(GeometryPrecisionReducer.reduce(
+								((Polygon)precinctPolygon.getGeometryN(j)).getExteriorRing(), new PrecisionModel(precisionLevel))))
+							return true;
+					return false;
+				}else if(Type.valueOf(statePolygon.getGeometryType().toUpperCase()) == Type.MULTIPOLYGON){
+					for(int i = 0; i < statePolygon.getNumGeometries(); i++){
+						if(GeometryPrecisionReducer.reduce(((Polygon)statePolygon.getGeometryN(i)).getExteriorRing(),
+								new PrecisionModel(precisionLevel)).intersects(
+										GeometryPrecisionReducer.reduce(((Polygon)precinctPolygon).getExteriorRing(), 
+												new PrecisionModel(precisionLevel))))
+							return true;
+					}
+					return false;
 				}
-				return false;
+				return GeometryPrecisionReducer.reduce(((Polygon)statePolygon).getExteriorRing(), new PrecisionModel(precisionLevel))
+						.intersects(GeometryPrecisionReducer.reduce(((Polygon)precinctPolygon).getExteriorRing(),
+								new PrecisionModel(precisionLevel)));
+			}catch(TopologyException e){			
+				isTopoExceptioned = true;
+				precisionLevel /= 10;
 			}
-			return statePolygon.getExteriorRing().intersects(((Polygon)precinctPolygon).getExteriorRing());
-		}catch(Exception e){			
-			return true;
-		}
+		}while(isTopoExceptioned);
+		return false;
 	}
 }

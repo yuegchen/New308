@@ -524,13 +524,7 @@ Resource style
   }
 }
 
-#map_1 {
-  height: 100%;
-  float: left;
-  width: 49%;
-}
-
-#map_1::after{
+#state-table1::after{
   content: "";
   background-color: #000;
   position: absolute;
@@ -539,10 +533,4 @@ Resource style
   top: 15%;
   left: 50%;
   display: block;
-}
-
-#map_1 {
-  height: 100%;
-  float: right;
-  width: 49%;
 }

@@ -9,6 +9,9 @@ import javax.persistence.Table;
 import org.geotools.geojson.geom.GeometryJSON;
 
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.PrecisionModel;
+import com.vividsolutions.jts.geom.TopologyException;
+import com.vividsolutions.jts.precision.GeometryPrecisionReducer;
 
 import cse308.Thymeleaf.model.Type;
 
@@ -46,11 +49,18 @@ public class PrecinctGeometry {
 	}
 	
 	public static boolean isNeighborPrecincts(Geometry geometry1, Geometry geometry2){
-		try{
-			return geometry1.intersects(geometry2);
-		}catch(Exception e){
-			System.err.println("count________________________________________");
-			return true;
+		double precisionLevel = 10000;
+		boolean isTopoExceptioned;
+		do{
+			try{
+				return GeometryPrecisionReducer.reduce(geometry1, new PrecisionModel(precisionLevel)).intersects(
+						GeometryPrecisionReducer.reduce(geometry2, new PrecisionModel(precisionLevel)));
+			}catch(TopologyException e){			
+				isTopoExceptioned = true;
+				precisionLevel /= 10;
+			}
 		}
+		while(isTopoExceptioned);
+		return false;
 	}
 }

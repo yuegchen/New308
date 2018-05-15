@@ -549,8 +549,10 @@ public class MainController {
 
 	
 	@RequestMapping(value = {"/dataInitialization"}, method = RequestMethod.GET)
-	public String initData(){
-		State state = new State(27);
+	public String initData() throws IOException{
+		State state = new State(25);
+		state.initiNeighborPrecincts();
+		state.initiBorderingPrecincts();
 		List<District> districts = state.initDistList();
 		System.out.println("Started");
 		

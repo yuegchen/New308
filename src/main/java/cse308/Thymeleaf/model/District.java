@@ -271,33 +271,23 @@ public class District {
 	
 	public double getStateBorderPrecBoundIntPerimeter(PrecinctGeometry precBound, StateGeometry stateBorder, GeometryJSON geometryJson) 
 			throws IOException{
-		Polygon	stateGeometry = StateGeometry.getStateGeometry(stateBorder, geometryJson);
 		double perimeter = 0;
 		boolean isTopoExceptioned;
 		double precisionLevel = 10000;
 		do{
 			try{
-				if(Type.valueOf(precBound.getType()).equals(Type.MULTIPOLYGON)){
-					Geometry precGeometry = (MultiPolygon) PrecinctGeometry.getPrecinctGeometries(precBound, geometryJson);
-					for(int i = 0; i < precGeometry.getNumGeometries(); i++){
-						perimeter += getIntersectionPerimeter(((GeometryPrecisionReducer.reduce(
-								((Polygon)precGeometry.getGeometryN(i)).getExteriorRing(), new PrecisionModel(precisionLevel)).intersection(
-								GeometryPrecisionReducer.reduce(stateGeometry.getExteriorRing(), new PrecisionModel(precisionLevel))))));
-					}
-				}else{
-					perimeter = getIntersectionPerimeter((GeometryPrecisionReducer.reduce(
-							((Polygon) PrecinctGeometry.getPrecinctGeometries(precBound, geometryJson)).getExteriorRing(),
-							new PrecisionModel(precisionLevel)).intersection(
-									GeometryPrecisionReducer.reduce(stateGeometry.getExteriorRing(), new PrecisionModel(precisionLevel)))));
-				}
+				Geometry intersection = GeometryPrecisionReducer.reduce(PrecinctGeometry.getPrecinctGeometries(precBound, geometryJson), 
+						new PrecisionModel(precisionLevel)).intersection(
+								GeometryPrecisionReducer.reduce(StateGeometry.getStateGeometry(stateBorder, geometryJson),
+										new PrecisionModel(precisionLevel)));
 				isTopoExceptioned = false;
+				perimeter = getIntersectionPerimeter(intersection);
 			}catch(TopologyException e){
 				isTopoExceptioned = true;
 				precisionLevel /= 10;
 			}
 		}while(isTopoExceptioned);
 		return perimeter;
-		
 	}
 	
 	public double getIntersectionPerimeter(Geometry intersection){

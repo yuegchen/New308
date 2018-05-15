@@ -18,6 +18,7 @@ import javax.persistence.Id;
 
 import org.geotools.geojson.geom.GeometryJSON;
 
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 
 @Entity
@@ -63,8 +64,7 @@ public class State {
 		List<PrecinctGeometry>	precinctGeometries=	new ArrayList<PrecinctGeometry>();
 		List<Precinct>			precincts		=	new ArrayList<Precinct>();
 		
-		// 27 is hard-coded, will be changed later
-		Polygon					statePolygon	=	StateGeometry.getStateGeometry(em.find(StateGeometry.class, stateId), geometryJson);
+		Geometry				statePolygon	=	StateGeometry.getStateGeometry(em.find(StateGeometry.class, stateId), geometryJson);
 		for(int i = 0; i < precinctIds.size(); i++)
 		{
 			precinctGeometries.add(em.find(PrecinctGeometry.class, (int)precinctIds.get(i))); 
