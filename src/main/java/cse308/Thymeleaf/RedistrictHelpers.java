@@ -144,11 +144,8 @@ public class RedistrictHelpers {
 			demWaste+=dem;
 			repWaste+=(rep-0.5);
 		}
-		System.err.println("demWaste: "+demWaste);
-		System.err.println("repWaste: "+repWaste);
 		efficiencyGap=Math.abs(demWaste-repWaste);
 		politicalFairness=1-efficiencyGap;
-		System.err.println("politicalFairness: "+politicalFairness*weight);
 		return politicalFairness*weight;
 	}
 

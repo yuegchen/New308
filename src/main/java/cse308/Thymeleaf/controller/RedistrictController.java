@@ -31,7 +31,7 @@ import cse308.Thymeleaf.RedistrictHelpers;
 import cse308.Thymeleaf.model.District;
 import cse308.Thymeleaf.model.Precinct;
 import cse308.Thymeleaf.model.State;
-
+import java.util.Random;
 @Controller
 public class RedistrictController {
 
@@ -137,6 +137,7 @@ public class RedistrictController {
 		private EntityManager em = emf.createEntityManager();	
 		private int	steps = 0;
 		private int nonSteps = 0;
+		private int lastGood=1;
 
 		@SuppressWarnings("unchecked")
 		@Override
@@ -240,12 +241,18 @@ public class RedistrictController {
 				double newScore=rh.calculateGoodness(fromDistrict,toDistrict, weights);
 				
 				System.out.println("new Score: "+newScore);
+				 Random rand = new Random();
+				 
+				
+//				if(steps==lastGood){
 				if (newScore > originalScore) {
-					fromDistrict.setCompactness(rh.calculateCompactness(fromDistrict, 1));
-					toDistrict.setCompactness(rh.calculateCompactness(toDistrict, 1));
-					fromDistrict.setEfficiencyGap(1-rh.calculatePoliticalFairness(fromDistrict, 1));
-					toDistrict.setCompactness(1-rh.calculatePoliticalFairness(toDistrict, 1));
+//					fromDistrict.setCompactness(rh.calculateCompactness(fromDistrict, 1));
+//					toDistrict.setCompactness(rh.calculateCompactness(toDistrict, 1));
+//					fromDistrict.setEfficiencyGap(1-rh.calculatePoliticalFairness(fromDistrict, 1));
+//					toDistrict.setCompactness(1-rh.calculatePoliticalFairness(toDistrict, 1));
 					originalScore=newScore;
+//					int i = rand.nextInt(4)+2;
+//					lastGood=steps+i;
 					nonSteps=0;
 				}
 				else{
