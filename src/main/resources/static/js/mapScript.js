@@ -51,6 +51,8 @@ var geojsonUSLayer;
 var geojsonStateData;
 var geojsonAvailableStateLayer;
 
+var stateId = 0;
+
 //big data file
 var maPrecincts = originalMAGeojsonStateData["features"];
 var ctPrecincts = originalCTGeojsonStateData["features"];
@@ -264,7 +266,7 @@ function setSelectedDistrict(district) {
 
 var myMap = L.map('mapid', {
     attributionControl: false
-}).setView([39.756214, -100.994031], 4);
+}).setView([39.756214, -100.994031], 4);    
 
 // Add an info control
 var info = L.control({
@@ -365,7 +367,6 @@ function resetHighlightUS(e) {
     // Clear information display
 }
 
-
 function resetHighlightAvailableState(e) {
     geojsonAvailableStateLayer.resetStyle(e.target);
 }
@@ -379,13 +380,12 @@ function onStateClickFeature(e) {
     }
 }
 
-
 function onUSLayerClickFeature(e) {
     myMap.removeLayer(geojsonAvailableStateLayer);
     myMap.removeLayer(geojsonUSLayer);
-        myMap.fitBounds(e.target.getBounds());
-        e.target.setStyle(styleStateShow);
-    
+    myMap.fitBounds(e.target.getBounds());
+    e.target.setStyle(styleStateShow);
+    stateId = e.target.feature.properties.STATE;
 
     // myMap.fitBounds(geojsonState.getBounds());
     // geojsonState.setStyle(styleStateShow);
@@ -458,9 +458,6 @@ for (var i = geojsonStateData.length - 1; i >= 0; i--) {
     geojsonState[i].setStyle(styleStateHidden);
 }
 
-
-
-
 geojsonUSLayer = L.geoJSON(geojsonUSData, {
     style: styleUS,
     onEachFeature: onEachFeatureUSLayer
@@ -496,7 +493,7 @@ myMap.on('zoomend', function(e) {
 
         geojsonAvailableStateLayer.addTo(myMap);
         geojsonAvailableStateLayer.setStyle(styleAvailableState);
-
+        stateId = 0;
     }
 
 });

@@ -1,9 +1,17 @@
 $("select").append($("<option></option>")
     .attr("value", null));
 $.each(stateNames, function(index, value) {
-    $("select").append($("<option></option>")
+    var option = $("<option></option>")
         .attr("value", (index + 1))
-        .text(value));
+        .text(value);
+    if(availableGeojsonStateData.features.properties.STATE != (index+1))
+        option.disabled = true;
+    $("select").append(option);
+});
+
+$('#select:option').on('click', function() {
+    if(('#select:option').val() != null)
+        stateId = $(this).val();
 });
 
 function setMode(evt, mode) {
