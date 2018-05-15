@@ -94,7 +94,7 @@ public class State {
 		EntityManager			em				=	emf.createEntityManager();
 		List<?>				districtBorderPrecinctIds		=	(List<?>) em.createQuery(
 				"SELECT p1.pid, p2.pid FROM Precinct p1, Precinct p2, NeighborPrecinct np WHERE (p1.pid = np.precinct.pid) AND (p2.pid = np.nid"
-				+	" AND p1.cd != p2.cd)").getResultList();
+				+	" AND p1.cd != p2.cd) AND (p1.sid = :stateId)").setParameter("stateId", stateId).getResultList();
 		List<?> 			stateBorderPrecinctIds			=	(List<?>) em.createQuery(
 				"SELECT p.pid FROM Precinct p, NeighborPrecinct np WHERE (p.pid = np.precinct.pid) AND (np.nid = :stateId)").
 				setParameter("stateId", MAX_STATE_ID_INITIAL-stateId).getResultList();
@@ -114,15 +114,23 @@ public class State {
 			Precinct nPrecInNDistrict = em.find(Precinct.class, (int)((Object[])districtBorderPrecinctIds.get(i))[1]);
 			District district = em.find(District.class, precinct.getCd());
 			if(storedPrecinctIdList.indexOf(precinct.getPid()) == -1){
-				storedPrecinctIdList.add(precinct.getPid());
-				em.persist(new BorderingPrecinct(precinct, district));
+	            em.createNativeQuery("INSERT INTO BORDERING_PRECINCT (PID, DISTRICT_CD)"
+	                    + " VALUES ( ?1, ?2)")
+	                    .setParameter(1, precinct.getPid())
+	                    .setParameter(2, district.getDId()).executeUpdate();
+	            storedPrecinctIdList.add(precinct.getPid());
 			}
 			String storedBorderIds = Integer.toString(nPrecInNDistrict.getCd()) + " " + Integer.toString(district.getDId());
 			if(storedBorderIdList.indexOf(storedBorderIds) == -1){
+	            em.createNativeQuery("INSERT INTO NEIGHBOR_DISTRICT (NDISTRICTID, DISTRICT_CD, SID)"
+	                    + " VALUES ( ?1, ?2, ?3)")
+	                    .setParameter(1, nPrecInNDistrict.getCd())
+	                    .setParameter(2, district.getDId())
+	                    .setParameter(3, stateId).executeUpdate();
 				storedBorderIdList.add(storedBorderIds);
-				em.persist(new NeighborDistrict(nPrecInNDistrict.getCd(), district, stateId));
 			}
 		}
+		
 		em.getTransaction().commit();
 	}
 	
@@ -134,7 +142,11 @@ public class State {
 			Precinct precinct = em.find(Precinct.class, (int)stateBorderPrecinctIds.get(i));
 			District district = new District(precinct.getCd(), stateId);
 			if(storedPrecinctIdList.indexOf(precinct.getPid()) == -1){
-				em.persist(new BorderingPrecinct(precinct, district));
+	            em.createNativeQuery("INSERT INTO BORDERING_PRECINCT (PID, DISTRICT_CD)"
+	                    + " VALUES ( ?1, ?2)")
+	                    .setParameter(1, precinct.getPid())
+	                    .setParameter(2, district.getDId());
+	            storedPrecinctIdList.add(precinct.getPid());
 			}
 		}
 		em.getTransaction().commit();

@@ -129,20 +129,20 @@ public class District {
 	          .setParameter(2, stateId)
 	          .getResultList();
 	      BufferedWriter writer;
-		try {
-				writer = new BufferedWriter(new FileWriter(
-						"C:\\eclipse\\Projects\\New308\\src\\main\\resources\\static\\externalProperty\\log.txt"));
+//		try {
+//				writer = new BufferedWriter(new FileWriter(
+//						System.getProperty("user.dir")  +"/main/resources/static/externalProperty/log.txt"));
 	      for (int i = 0; i < borderPrecIdList.size(); i++) {
 	          Precinct precinct = em.find(Precinct.class, (int) borderPrecIdList.get(i));
 	          borderingPrecinctList.add(precinct);
-	          writer.write("border Precinct of " + this.getDId() + " : " + precinct.getPid());
+//	          writer.write("border Precinct of " + this.getDId() + " : " + precinct.getPid());
 	      }	
-	      writer.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	  }
+//	      writer.close();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+	  } 
       return borderingPrecinctList;
   }
 
