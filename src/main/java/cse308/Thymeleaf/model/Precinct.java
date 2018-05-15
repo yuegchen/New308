@@ -1,7 +1,5 @@
 package cse308.Thymeleaf.model;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -163,26 +161,20 @@ public class Precinct {
 		  EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
 		  EntityManager em = emf.createEntityManager();
 	      nPrecIdList = (List<Integer> ) em.createNativeQuery(
-	    		  "SELECT np.NID FROM NEIGHBOR_PRECINCT np WHERE np.PRECINCT_PID = ?")
-	          .setParameter(1, pid)
-	          .getResultList();
-	      BufferedWriter writer;
-			try {
-				writer = new BufferedWriter(new FileWriter("C:\\eclipse\\Projects\\New308\\src\\main\\resources\\static\\externalProperty\\log.txt"));
-				
+					"SELECT np.NID FROM NEIGHBOR_PRECINCT np WHERE np.PRECINCT_PID = ?").setParameter(1, pid)
+					.getResultList();
+
+//			BufferedWriter writer;
 			
-	      for (int i = 0; i < nPrecIdList.size(); i++) {
-	    	  if((int)nPrecIdList.get(i) < 999999900){
-	    		  Precinct precinct = em.find(Precinct.class, (int) nPrecIdList.get(i));
-	        	  neighborPrecincts.add(precinct);
-	        	  writer.write("neighborPrecinct of "+this.getPid()+" : "+precinct.getPid());
-	    	  }
-	      }
-	      writer.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+
+				for (int i = 0; i < nPrecIdList.size(); i++) {
+					if ((int) nPrecIdList.get(i) < 999999900) {
+						Precinct precinct = em.find(Precinct.class, (int) nPrecIdList.get(i));
+						neighborPrecincts.add(precinct);
+					
+					}
+				}
+		
 		}
 		return neighborPrecincts;
 	}

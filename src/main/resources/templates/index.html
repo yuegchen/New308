@@ -24,7 +24,7 @@
   	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
    </head>
    <script language="javascript" type="text/javascript">
-	// <!CDATA[
+   		var geojsonState;
 		function About_onclick() {
 			window.open("about","_self");
 		}
@@ -69,8 +69,8 @@
 		    	var stateId = stateNames.indexOf(geojsonStateData['state']);
 		    	ws.send('/app/redistrict', {}, JSON.stringify({
 		    		"request": "start", 
-		    		"stateId": 27, 
-		    		"weights": [0, 0, 1],
+		    		"stateId": 25, 
+		    		"weights": [1, 0, 0],
 		    		"contiguity": $('input.contiguity').is(':checked')
 		    	}));
 	    	}

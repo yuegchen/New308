@@ -158,7 +158,7 @@ public class District {
 	          .setParameter(1, districtId)
 	          .setParameter(2, stateId)
 	          .getResultList();
-	      BufferedWriter writer;
+//	      BufferedWriter writer;
 //		try {
 //				writer = new BufferedWriter(new FileWriter(
 //						System.getProperty("user.dir")  +"/main/resources/static/externalProperty/log.txt"));

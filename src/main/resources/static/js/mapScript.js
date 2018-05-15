@@ -46,7 +46,6 @@ var precinctDataCT = {};
 
 var precinctDistricts = {}; // A dictionary that maps precinct ID to district number
 var geojsonUS;
-var geojsonState;
 var geojsonUSLayer;
 var geojsonStateData;
 var geojsonAvailableStateLayer;

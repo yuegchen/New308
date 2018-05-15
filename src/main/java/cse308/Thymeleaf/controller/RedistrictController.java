@@ -154,7 +154,7 @@ public class RedistrictController {
 							}
 							for(Map.Entry<District, District> entry: map.entrySet()){
 								tryMove(borderPrecinctsArray, entry.getKey(), entry.getValue());
-								if(endingCondition)
+								if(!endingCondition)
 									break end_redistricting;
 							}
 							//Thread.sleep(2000);
