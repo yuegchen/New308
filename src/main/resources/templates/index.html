@@ -79,7 +79,10 @@
 						<p>Partisan Fairness: </p><input type="range" min="0" max="100" value="50" step="1" class="slider" id="partisan">
 						<h3>CONSTRAINT</h3>
 						<p>Contiguity</p><input type="checkbox" class="contiguity" value="CONTIGUITY">
-						<button style="margin: 15px auto; display:block;" class="tab_button" onclick="start()">Generate</button>
+						<button style="margin: 15px auto; display:block;" class="tab_button" id="generate" onclick="start()">Generate</button>
+						<button style="margin: 15px auto; display:none;" class="tab_button" id="pause" onclick="pause()" >Pause</button>
+						<button style="margin: 15px auto; display:none;" class="tab_button" id="resume" onclick="resume()" >Resume</button>
+						<button style="margin: 15px auto; display:none;" class="tab_button" id="stop" onclick="stop()" >Stop</button>
 	  				</div>
 				</div>
 				<div id="manual" class="panel_content">

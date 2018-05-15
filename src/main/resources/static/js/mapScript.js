@@ -160,9 +160,11 @@ function getInfoOther(PrecinctID) {
 
 
 function redraw() {
+
     
         getjsonState.setStyle(styleStateShow);
     
+
     
 }
 
@@ -416,28 +418,6 @@ function onEachFeatureUSLayer(feature, layer) {
 
 function onEachFeatureUS(feature, layer) {}
 
-// myMap.on('zoomend', function(e){
-// 	if (mymap.getZoom() >= 7) {
-// 		geojsonState = L.geoJSON(geojsonStateData, {
-// 			style: style, 
-// 			onEachFeature: onEachFeatureState
-// 		});
-// 		// if(myMap.hasLayer(geojsonUS)){
-// 		// 	myMap.removeLayer(geojsonUS);	
-// 		// }
-// 		geojsonState.addTo(myMap);
-// 	} else {
-// 		geojsonUS = L.getJSON(geojsonUSData, {
-// 			style: style,
-// 			onEachFeature: onEachFeatureUS
-// 		});
-// 		// if(myMap.hasLayer(geojsonState)){
-// 		// 	myMap.removeLayer(gegeojsonState);	
-// 		// }
-// 		geojsonUS.addTo(myMap);
-// 	}
-
-// });
 geojsonUS = L.geoJSON(geojsonUSData, {
     style: styleUS,
     onEachFeature: onEachFeatureUS
