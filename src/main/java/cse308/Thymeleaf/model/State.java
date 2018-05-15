@@ -59,16 +59,18 @@ public class State {
 	public void initiNeighborPrecincts() throws IOException{
 		EntityManagerFactory	emf				=	Persistence.createEntityManagerFactory("Eclipselink_JPA");
 		EntityManager			em				=	emf.createEntityManager();
-		List<?>					precinctIds		=	(List<?>) em.createQuery("SELECT pg.pid FROM PrecinctGeometry pg").getResultList();
+		List<?>					precinctIds		=	(List<?>) em.createQuery("SELECT p.pid FROM Precinct p WHERE p.sid = :sid").setParameter("sid", stateId).getResultList();
 		GeometryJSON			geometryJson	=	new GeometryJSON();
 		List<PrecinctGeometry>	precinctGeometries=	new ArrayList<PrecinctGeometry>();
 		List<Precinct>			precincts		=	new ArrayList<Precinct>();
 		
 		Geometry				statePolygon	=	StateGeometry.getStateGeometry(em.find(StateGeometry.class, stateId), geometryJson);
+		System.err.println("StateId: " + stateId);
 		for(int i = 0; i < precinctIds.size(); i++)
 		{
 			precinctGeometries.add(em.find(PrecinctGeometry.class, (int)precinctIds.get(i))); 
 			precincts.add(em.find(Precinct.class, (int)precinctIds.get(i)));
+			System.out.println("Precinct Ids: " + (int)precinctIds.get(i));
 		}
 		for(int i = 0; i < precinctIds.size(); i++){
 			em.getTransaction().begin();

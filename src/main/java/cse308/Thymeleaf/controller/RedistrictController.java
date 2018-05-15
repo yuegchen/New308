@@ -44,6 +44,7 @@ public class RedistrictController {
     private boolean endingCondition = true;
     private boolean contiguity = true;
     private boolean isPaused = false;
+    private boolean stoppingCondition = false;
     private int     stateId;
     private double [] weights;
 //    private State originalState;
@@ -74,7 +75,14 @@ public class RedistrictController {
 						System.out.println("weight "+i+" : "+weights[0]);
 					}
 					endingCondition = true;
-					this.te.execute(new RedistrictingThread());
+					while(true){
+						this.te.execute(new RedistrictingThread());
+						while(!stoppingCondition){
+							Thread.sleep(5000);
+						}
+						endingCondition = true;
+						break;
+					}
 					break;
 				case PAUSE:
 					isPaused = true;
@@ -85,6 +93,9 @@ public class RedistrictController {
 				case STOP:
 					isPaused = false;
 					endingCondition = false;
+					break;
+				case DISCONNECT:
+					stoppingCondition = true;
 					break;
 				case COMPARE:
 					smt.convertAndSend("/redistrict/reply" );
@@ -148,9 +159,6 @@ public class RedistrictController {
 					}
 					if(steps < maxMoves && nonSteps < maxNonImprovedSteps){
 						for(Map<District, District> map : neighborDistrictPairs){	
-							while(isPaused){
-								Thread.sleep(1000);
-							}
 							if(steps >= maxMoves){
 								System.err.println("steps exceeds MAX_MOVES");
 								endingCondition = false;
@@ -166,7 +174,6 @@ public class RedistrictController {
 								if(!endingCondition)
 									break end_redistricting;
 							}
-							//Thread.sleep(2000);
 						}
 					}
 					
@@ -180,7 +187,7 @@ public class RedistrictController {
 			}
 		}
 
-		private void tryMove(List<Precinct>[] borderPrecinctsArray,District fromDistrict, District toDistrict) throws IOException {
+		private void tryMove(List<Precinct>[] borderPrecinctsArray,District fromDistrict, District toDistrict) throws IOException, InterruptedException {
 			double originalScore=rh.calculateGoodness(fromDistrict, toDistrict, weights);
 			System.out.println("originalScore: "+originalScore);
 			Map<Integer, Integer> movedPrecincts = new HashMap<Integer, Integer>();
@@ -202,6 +209,12 @@ public class RedistrictController {
 					toBorderPrecincts.add(precinct);
 					fromBorderPrecincts.remove(precinct);
 					steps++;
+					Thread.sleep(1000);
+					while(isPaused){
+						Thread.sleep(1000);
+					}
+					if(!endingCondition)
+						return;
 				} 
 				else
 					continue;
@@ -223,8 +236,12 @@ public class RedistrictController {
 					fromBorderPrecincts.add(precinct);
 					toBorderPrecincts.remove(precinct);
 				}
+				while(isPaused){
+					Thread.sleep(1000);
+				}
+				if(!endingCondition)
+					return;
 			}
-			
 		}
 	}
 }
