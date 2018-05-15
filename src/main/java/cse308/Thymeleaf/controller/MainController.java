@@ -589,35 +589,9 @@ public class MainController {
 		    return token.toString();
 		}
 	}
-
-	@RequestMapping(value = {"/dataInitializatio1"}, method = RequestMethod.GET)
-	public String initData1() throws IOException{
-		State state = new State(9);
-
-		state.initiNeighborPrecincts();
-		state.initiBorderingPrecincts();
-		List<District> districts = state.initDistList();
-//		System.out.println("Started");
-		
-		for(District district: districts){
-			System.err.println(district.getDId());
-			List<Precinct> precincts = district.initPrecList();
-			for(Precinct precinct: precincts){
-				System.err.println(precinct.getPid());
-				try {
-					System.out.println(precinct.initArea());
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-		return new Gson().toJson("{'state' : 'okay'}");
-		
-	}	
 	
-	@RequestMapping(value = {"/dataInitialization2"}, method = RequestMethod.GET)
-	public String initData2() throws IOException{
+	@RequestMapping(value = {"/dataInitialization"}, method = RequestMethod.GET)
+	public String initData() throws IOException{
 		State state = new State(27);
 
 		state.initiNeighborPrecincts();
