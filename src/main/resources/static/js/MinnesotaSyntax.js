@@ -38,3 +38,24 @@ var stateSyntax = {
 	"Total Vote" : "USPRSTOTAL",
 	"Original District" : "CONGDIST", 
 };
+var stateSyntaxMA = {
+	"Precinct Name" : "NAME",
+	"Precinct ID" : "GEOID10",
+	"Municipality" : "TOWN",
+	"Republican vote" : "REPUBLICAN",
+	"Democrat vote" : "DEMOCRAT",
+	"Population" : "POP100", 
+};
+var stateSyntaxCT = {
+	"Precinct Name" : "NAME",
+	"Precinct ID" : "GEOID10",
+	"Municipality" : "TOWN",
+	"Republican vote" : "REPUBLICAN",
+	"Democrat vote" : "DEMOCRAT",
+	"Total vote" : "TOTAL",
+	"Population" : "POP100", 
+};
+
+
+
+
