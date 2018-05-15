@@ -77,7 +77,6 @@ public class District {
 	public District(int districtId, int stateId) {
 		this.districtId = districtId;
 		this.stateId = stateId;
-		System.out.println("districtId: " + districtId);
 		this.precinctList = initPrecList();
 		this.borderingPrecinctList = initBorderingPrecinctList();
 	}
@@ -244,7 +243,6 @@ public class District {
 
 	public double getArea() throws IOException {
 		double districtArea = 0.0;
-
 		for (Precinct precinct : initPrecList()) {
 			districtArea += precinct.getArea();
 		}

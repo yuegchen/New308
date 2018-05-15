@@ -25,9 +25,11 @@ function start(){
     		"request": "start", 
     		"stateId": stateId, 
     		"weights": [$('#compactness').val(), $('#population').val(), $('#partisan').val()],
-    		"contiguity": $('input.contiguity').is(':checked')
+    		"contiguity": $('input.contiguity').is(':checked'),
+    		"districtid": $('input.districtidn').val(),
+    		"precinctid": $('input.precinctidn').val()
     	}));
-    	$(this).hide();
+    	$('#generate').hide();
     	$('#pause').show();
     	$('#resume').show();
     	$('#stop').show();
@@ -49,10 +51,10 @@ function resume(){
 function stop(){
 	if (ws != null) {
     	ws.send('/app/redistrict', {}, JSON.stringify({"request": 'stop'}));
-    	$('#generate').hide();
+    	$('#generate').show();
     	$('#pause').hide();
     	$('#resume').hide();
-    	$(this).hide();
+    	$('#stop').hide();
 	}
 }
 

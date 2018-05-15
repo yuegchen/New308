@@ -51,7 +51,7 @@ public class StateGeometry {
 			if(Type.valueOf(precinctPolygon.getGeometryType().toUpperCase()) == Type.MULTIPOLYGON &&
 					Type.valueOf(statePolygon.getGeometryType().toUpperCase()) == Type.MULTIPOLYGON ){
 				for(int i = 0; i < statePolygon.getNumGeometries(); i++){
-					for(int j = 0; j < statePolygon.getNumGeometries(); j++)
+					for(int j = 0; j < precinctPolygon.getNumGeometries(); j++)
 						if(((Polygon)statePolygon.getGeometryN(i)).getExteriorRing().intersects(
 								((Polygon)precinctPolygon.getGeometryN(j)).getExteriorRing())){
 							return true;

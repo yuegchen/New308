@@ -46,6 +46,9 @@ public class RedistrictController {
     private boolean isPaused = false;
     private boolean stoppingCondition = false;
     private int     stateId;
+    private int 	districtidn;
+    private int		precinctidn;
+    
     private double [] weights;
 //    private State originalState;
 //    private State newState;
@@ -66,6 +69,18 @@ public class RedistrictController {
 					contiguity = (boolean) requestJson.get("contiguity");
 					System.out.println("contiguity: "+contiguity);
 					weights = gson.fromJson(requestJson.get("weights").toString(), double[].class);
+					if(requestJson.get("districtid").toString() != "0"){
+						districtidn = (int) Double.parseDouble(requestJson.get("districtid").toString());
+					}else{
+						districtidn = 0;
+					}
+					
+					if(requestJson.get("precinctid").toString() != "0"){
+						precinctidn = (int) Double.parseDouble(requestJson.get("precinctid").toString());
+					}else{
+						precinctidn = 0;
+					}
+					
 					double total=0;
 					for(double w:weights){
 						total+=w;
@@ -81,7 +96,7 @@ public class RedistrictController {
 							Thread.sleep(5000);
 						}
 						endingCondition = true;
-						break;
+						break; 
 					}
 					break;
 				case PAUSE:
@@ -134,6 +149,11 @@ public class RedistrictController {
 					int maxNonImprovedSteps = ep.getNonImprovedSteps();
 
 					List<District> districts = rh.getDistrictsByState(stateId, em);
+					for(District district: districts)
+						if(district.getDId() == districtidn){
+							districts.remove(district);
+							break;
+						}
 //					for(District d:originalState.initDistList()){
 //						d.setCompactness(rh.calculateCompactness(d, 1));
 //						d.setPopulation(d.getPop());
@@ -196,7 +216,7 @@ public class RedistrictController {
 			List<Precinct> tempBorderPList=new ArrayList<Precinct>();
 			for(Precinct precinct : fromBorderPrecincts){
 				for(Precinct precinct2: toBorderPrecincts){
-				if(precinct.isNeighbor(precinct2.getPid()))
+				if(precinct.isNeighbor(precinct2.getPid()) && precinct.getPid() != precinctidn)
 					if(!tempBorderPList.contains(precinct))
 						tempBorderPList.add(precinct);
 				}
@@ -209,14 +229,13 @@ public class RedistrictController {
 					toBorderPrecincts.add(precinct);
 					fromBorderPrecincts.remove(precinct);
 					steps++;
-					Thread.sleep(1000);
 					while(isPaused){
 						Thread.sleep(1000);
 					}
 					if(!endingCondition)
 						return;
 				} 
-				else
+				else 
 					continue;
 				double newScore=rh.calculateGoodness(fromDistrict,toDistrict, weights);
 				
