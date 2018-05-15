@@ -41,6 +41,7 @@ public class RedistrictController {
     private SimpMessagingTemplate smt;
     
     private boolean endingCondition = true;
+    private boolean contiguity = true;
     private boolean isPaused = false;
     private int     stateId;
     private double [] weights;
@@ -55,6 +56,7 @@ public class RedistrictController {
 			switch(RecoloringOption.valueOf(requestType)){
 				case START:
 					stateId = (int) Double.parseDouble(requestJson.get("stateId").toString());
+					contiguity = (boolean) requestJson.get("contiguity");
 					weights = gson.fromJson(requestJson.get("weights").toString(), double[].class);
 					endingCondition = true;
 					this.te.execute(new RedistrictingThread());
@@ -170,8 +172,8 @@ public class RedistrictController {
 						tempBorderPList.add(precinct);
 				}
 			}
-			for (Precinct precinct : tempBorderPList) {	
-				if(rh.checkConstraint(precinct,toDistrict, movedPrecincts)){
+			for (Precinct precinct : tempBorderPList) {
+				if(!contiguity||rh.checkConstraint(precinct,toDistrict, movedPrecincts)){
 					System.out.println("precinct: " + precinct); 
 					smt.convertAndSend("/redistrict/reply", rh.moveTo(precinct, fromDistrict, toDistrict, false));
 					movedPrecincts.put(precinct.getPid(), toDistrict.getDId());
