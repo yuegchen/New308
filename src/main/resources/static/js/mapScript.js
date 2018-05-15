@@ -379,13 +379,13 @@ function onStateClickFeature(e) {
     }
 }
 
+
 function onUSLayerClickFeature(e) {
     myMap.removeLayer(geojsonAvailableStateLayer);
     myMap.removeLayer(geojsonUSLayer);
-    for (var i = geojsonState.length - 1; i >= 0; i--) {
-        myMap.fitBounds(geojsonState[i].getBounds());
-        geojsonState[i].setStyle(styleStateShow);
-    }
+        myMap.fitBounds(e.target.getBounds());
+        e.target.setStyle(styleStateShow);
+    
 
     // myMap.fitBounds(geojsonState.getBounds());
     // geojsonState.setStyle(styleStateShow);
