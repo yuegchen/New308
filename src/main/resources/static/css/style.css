@@ -212,7 +212,7 @@ Resource style
 }
 
 .cd-main-content h1 {
-  font-size: 2rem;
+  font-size: 1.5rem;
   color: #64788c;
   padding: 4em 0;
 }
@@ -239,7 +239,7 @@ Resource style
 
 @media only screen and (min-width: 1170px) {
   .cd-main-content h1 {
-    font-size: 3.2rem;
+    font-size: 2rem;
   }
 }
 

@@ -31,6 +31,7 @@ function setMode(evt, mode) {
             init_manual();
             break;
         case "compare":
+            init_compare()
             break;
         case "visualize":
             break;
@@ -50,6 +51,17 @@ function setMode(evt, mode) {
         // Populate the div with content
         var ele = document.getElementById("district_container");
         ele.innerHTML = getDistrictDisplay();
+    }
+
+    function init_compare() {
+        var div = $('<div></div>').addClass('cd-panel cd-panel--from-left js-cd-panel-main');
+
+        var header = $('<header></header>').addClass('cd-panel__header');
+        var h1 = $('<h1></h1>');
+        var a = $('<a></a>').attr('href', '#');
+        header.append(h1, a);
+
+        var divContainer = $('<div></div>').addClass('')
     }
 
     function getDistrictDisplay() {
