@@ -30,6 +30,7 @@ import cse308.Thymeleaf.RecoloringOption;
 import cse308.Thymeleaf.RedistrictHelpers;
 import cse308.Thymeleaf.model.District;
 import cse308.Thymeleaf.model.Precinct;
+import cse308.Thymeleaf.model.State;
 
 @Controller
 public class RedistrictController {
@@ -45,6 +46,8 @@ public class RedistrictController {
     private boolean isPaused = false;
     private int     stateId;
     private double [] weights;
+    private State originalState;
+    private State newState;
 
 	@MessageMapping("/redistrict")
 	@SendTo("/redistrict/reply")
@@ -56,7 +59,10 @@ public class RedistrictController {
 			switch(RecoloringOption.valueOf(requestType)){
 				case START:
 					stateId = (int) Double.parseDouble(requestJson.get("stateId").toString());
+					originalState=new State(stateId);
+					newState=new State(stateId);
 					contiguity = (boolean) requestJson.get("contiguity");
+					System.out.println("contiguity: "+contiguity);
 					weights = gson.fromJson(requestJson.get("weights").toString(), double[].class);
 					endingCondition = true;
 					this.te.execute(new RedistrictingThread());
@@ -108,6 +114,12 @@ public class RedistrictController {
 					int maxNonImprovedSteps = ep.getNonImprovedSteps();
 
 					List<District> districts = rh.getDistrictsByState(stateId, em);
+					for(District d:originalState.initDistList()){
+						d.setCompactness(rh.calculateCompactness(d, 1));
+						d.setPopulation(d.getPop());
+						d.setEfficiencyGap(1-rh.calculatePoliticalFairness(d, 1));
+					}
+					newState.setDistList(districts);
 					List<Precinct>[] borderPrecinctsArray = (List<Precinct>[])new List[districts.size()];
 					for(int i = 0; i < districts.size(); i++){
 						borderPrecinctsArray[districts.get(i).getDId()-1] = districts.get(i).initBorderingPrecinctList();
@@ -184,9 +196,13 @@ public class RedistrictController {
 				else
 					continue;
 				double newScore=rh.calculateGoodness(fromDistrict,toDistrict, weights);
+				
 				System.out.println("new Score: "+newScore);
 				if (newScore > originalScore) {
-					
+					fromDistrict.setCompactness(rh.calculateCompactness(fromDistrict, 1));
+					toDistrict.setCompactness(rh.calculateCompactness(toDistrict, 1));
+					fromDistrict.setEfficiencyGap(1-rh.calculatePoliticalFairness(fromDistrict, 1));
+					toDistrict.setCompactness(1-rh.calculatePoliticalFairness(toDistrict, 1));
 					originalScore=newScore;
 					nonSteps=0;
 				}
