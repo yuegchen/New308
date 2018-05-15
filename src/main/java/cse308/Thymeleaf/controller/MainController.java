@@ -550,7 +550,7 @@ public class MainController {
 	
 	@RequestMapping(value = {"/dataInitialization"}, method = RequestMethod.GET)
 	public String initData() throws IOException{
-		State state = new State(25);
+		State state = new State(9);
 		state.initiNeighborPrecincts();
 		state.initiBorderingPrecincts();
 		List<District> districts = state.initDistList();
