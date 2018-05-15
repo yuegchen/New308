@@ -69,6 +69,8 @@ public class RedistrictController {
 					isPaused = false;
 					endingCondition = false;
 					break;
+				case COMPARE:
+					smt.convertAndSend("/redistrict/reply, ");
 				default:
 					break;
 			}
@@ -96,7 +98,8 @@ public class RedistrictController {
 		@SuppressWarnings("unchecked")
 		@Override
 		public void run(){
-			while(endingCondition){
+			end_redistricting:
+			if(endingCondition){
 				try {
 					ExternalProperties ep = new ExternalProperties();
 					int maxMoves = ep.getMaxMoves();
@@ -120,7 +123,6 @@ public class RedistrictController {
 							}
 						}
 					}
-					end_redistricting:
 					if(steps < maxMoves && nonSteps < maxNonImprovedSteps){
 						for(Map<District, District> map : neighborDistrictPairs){	
 							while(isPaused){
@@ -136,8 +138,11 @@ public class RedistrictController {
 								endingCondition = false;
 								break end_redistricting;
 							}
-							for(Map.Entry<District, District> entry: map.entrySet())
+							for(Map.Entry<District, District> entry: map.entrySet()){
 								tryMove(borderPrecinctsArray, entry.getKey(), entry.getValue());
+								if(endingCondition)
+									break end_redistricting;
+							}
 							//Thread.sleep(2000);
 						}
 					}
@@ -165,7 +170,7 @@ public class RedistrictController {
 						tempBorderPList.add(precinct);
 				}
 			}
-			for (Precinct precinct : tempBorderPList) {
+			for (Precinct precinct : tempBorderPList) {	
 				if(rh.checkConstraint(precinct,toDistrict, movedPrecincts)){
 					System.out.println("precinct: " + precinct); 
 					smt.convertAndSend("/redistrict/reply", rh.moveTo(precinct, fromDistrict, toDistrict, false));

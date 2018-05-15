@@ -4,5 +4,6 @@ public enum RecoloringOption {
 	START,
 	PAUSE,
 	RESUME,
-	STOP
+	STOP,
+	COMPARE
 }

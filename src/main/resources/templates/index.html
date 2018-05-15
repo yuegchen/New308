@@ -71,6 +71,7 @@
 		    		"request": "start", 
 		    		"stateId": 27, 
 		    		"weights": [0, 0, 1]
+		    		"contiguity": $('input.contiguity').is(':checked')
 		    	}));
 	    	}
 	    }
@@ -91,6 +92,13 @@
         	if (ws != null) {
 	        	ws.send('/app/redistrict', {}, JSON.stringify({"request": 'stop'}));
 	        	ws.disconnect();
+     		}
+    	}
+
+    	function compareDistricts(){
+        	if (ws != null) {
+	        	ws.send('/app/redistrict', {}, JSON.stringify({"request": 'compare'}));
+	        	
      		}
     	}
 
@@ -127,9 +135,12 @@
 					<p>Automatically generate a redistricting plan based on user's focus</p> 
 					<hr>
 					<div id="redistrict_container">
+						<h3>WEIGHTS</h3>
 						<p>Compactness: </p><input type="range" min="1" max="100" value="50" class="slider" id="compactness">
 						<p>Population: </p><input type="range" min="1" max="100" value="50" class="slider" id="population">
 						<p>Partisan Fairness: </p><input type="range" min="1" max="100" value="50" class="slider" id="partisan">
+						<h3>CONSTRAINT</h3>
+						<p>Contiguity</p><input type="checkbox" class="contiguity" value="CONTIGUITY">
 						<button style="margin: 15px auto; display:block;" class="tab_button" onclick="">Generate</button>
 	  				</div>
 				</div>
