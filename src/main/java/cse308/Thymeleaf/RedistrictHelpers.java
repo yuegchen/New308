@@ -23,7 +23,7 @@ public class RedistrictHelpers {
 		double compactness2 = calculateCompactness(d2, weights[0]);
 		double population = calculatePopulation(d,d2, weights[1]);
 		double politicalFairness1 = calculatePoliticalFairness(d, weights[2]);
-		double politicalFairness2 = calculatePoliticalFairness(d, weights[2]);
+		double politicalFairness2 = calculatePoliticalFairness(d2, weights[2]);
 		double totalGoodness = compactness1+compactness2 + population*2 + politicalFairness1+politicalFairness2;
 		return totalGoodness; 
 	}
@@ -113,12 +113,17 @@ public class RedistrictHelpers {
 	}
 
 	public double calculatePoliticalFairness(District d1, double weight) {
+		double efficiencyGap=0;
 		double politicalFairness=0;
 		double dem=d1.getDem();
 		double rep=d1.getRep();
 		System.err.println("dem: "+dem);
 		System.err.println("rep: "+rep);
-		politicalFairness=1-Math.abs(dem-rep);
+		if(dem>rep)
+			efficiencyGap=Math.abs(rep-(dem-0.51));
+		else
+			efficiencyGap=Math.abs(dem-(rep-0.51));
+		politicalFairness=1-efficiencyGap;
 		System.err.println("politicalFairness: "+politicalFairness*weight);
 		return politicalFairness*weight;
 	}

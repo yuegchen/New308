@@ -164,7 +164,7 @@ public class RedistrictingController {
 		
 		double population = calculatePopulation(d,d2, weights[1]);
 		double politicalFairness1 = calculatePoliticalFairness(d, weights[2]);
-		double politicalFairness2 = calculatePoliticalFairness(d, weights[2]);
+		double politicalFairness2 = calculatePoliticalFairness(d2, weights[2]);
 		double totalGoodness = compactness1+compactness2 + population*2 + politicalFairness1+politicalFairness2;
 		return totalGoodness; 
 	}
