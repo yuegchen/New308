@@ -45,6 +45,7 @@ var stateSyntaxMA = {
 	"Republican vote" : "REPUBLICAN",
 	"Democrat vote" : "DEMOCRAT",
 	"Population" : "POP100", 
+	"Original District" : "CD",
 };
 var stateSyntaxCT = {
 	"Precinct Name" : "NAME",
@@ -54,6 +55,7 @@ var stateSyntaxCT = {
 	"Democrat vote" : "DEMOCRAT",
 	"Total vote" : "TOTAL",
 	"Population" : "POP100", 
+	"Original District" : "CD",
 };
 
 

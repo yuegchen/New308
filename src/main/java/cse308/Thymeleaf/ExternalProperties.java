@@ -7,7 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class ExternalProperties {
-	private	String path = System.getProperty("user.dir") + "\\src\\main\\resources\\static\\externalProperty\\Property.txt";
+	private	String path = System.getProperty("user.dir") + "/src/main/resources/static/externalProperty/Property.txt";
 	private int		maxMoves;
 	private int		maxNonImprovedSteps;
 	public ExternalProperties(){

@@ -62,7 +62,6 @@ var ctPrecincts = originalCTGeojsonStateData["features"];
 // Returns a dictionary mapping district numbers to colors.
 function getDistrictColors() {
     var toReturn = {};
-
     var districts = Object.values(precinctDistricts);
     for (var i = 0; i < districts.length; i++) {
         var cur_dist = districts[i];
@@ -160,7 +159,10 @@ function getInfoOther(PrecinctID) {
 
 
 function redraw() {
-    geojsonState.setStyle(styleStateShow);
+    for (var i = getjsonState.length - 1; i >= 0; i--) {
+        getjsonState[i].setStyle(styleStateShow);
+    }
+    
 }
 
 // Compare vote data and paint a voting precinct red or blue.
@@ -216,7 +218,10 @@ function resetStateCT() {
         // Tie precinct ID to stats;
         precinctDataCT[cur[stateSyntaxCT[precinctID_NAME]]] = cur;
         // console.log(cur);
-        // precinctDistricts[cur[stateSyntaxCT[precinctID_NAME]]] = cur[stateSyntax[precinctOrigDist_NAME]];
+        
+        precinctDistricts[cur[stateSyntaxCT[precinctID_NAME]]] = cur[stateSyntaxCT[precinctOrigDist_NAME]];
+        
+        
     }
     // console.log(precinctDataCT);
 }
@@ -227,7 +232,10 @@ function resetStateMA() {
         var cur = maPrecincts[i].properties;
         // Tie precinct ID to stats;
         precinctDataMA[cur[stateSyntaxMA[precinctID_NAME]]] = cur;
-        // precinctDistricts[cur[stateSyntax[precinctID_NAME]]] = cur[stateSyntax[precinctOrigDist_NAME]];
+        
+        precinctDistricts[cur[stateSyntaxMA[precinctID_NAME]]] = cur[stateSyntaxMA[precinctOrigDist_NAME]];   
+        
+        
     }
 }
 resetStateMA();
@@ -278,12 +286,15 @@ function styleStateHidden(feature) {
 
 function styleStateShow(feature) {
     setColoring(getColor_District);
+    // console.log(getColor_District);
+    // console.log(feature.properties[precinctID_Other]);
+
     return {
         weight: 1,
         opacity: 1,
-        color: getColor(feature.properties[precinctIDString_GEO]),
+        color: getColor(feature.properties[precinctID_Other]),
         fillOpacity: 0.7,
-        fillColor: getColor(feature.properties[precinctIDString_GEO])
+        fillColor: getColor(feature.properties[precinctID_Other])
     };
 }
 
@@ -371,8 +382,13 @@ function onStateClickFeature(e) {
 function onUSLayerClickFeature(e) {
     myMap.removeLayer(geojsonAvailableStateLayer);
     myMap.removeLayer(geojsonUSLayer);
-    myMap.fitBounds(geojsonState.getBounds());
-    geojsonState.setStyle(styleStateShow);
+    for (var i = geojsonState.length - 1; i >= 0; i--) {
+        myMap.fitBounds(geojsonState[i].getBounds());
+        geojsonState[i].setStyle(styleStateShow);
+    }
+
+    // myMap.fitBounds(geojsonState.getBounds());
+    // geojsonState.setStyle(styleStateShow);
 }
 
 function onEachFeatureState(feature, layer) {
