@@ -225,15 +225,15 @@ public class RedistrictController {
 				 Random rand = new Random();
 				 
 				
-				if(steps==lastGood){
-//				if (newScore > originalScore) {
+//				if(steps==lastGood){
+				if (newScore > originalScore) {
 //					fromDistrict.setCompactness(rh.calculateCompactness(fromDistrict, 1));
 //					toDistrict.setCompactness(rh.calculateCompactness(toDistrict, 1));
 //					fromDistrict.setEfficiencyGap(1-rh.calculatePoliticalFairness(fromDistrict, 1));
 //					toDistrict.setCompactness(1-rh.calculatePoliticalFairness(toDistrict, 1));
 					originalScore=newScore;
-					int i = rand.nextInt(4)+2;
-					lastGood=steps+i;
+//					int i = rand.nextInt(4)+2;
+//					lastGood=steps+i;
 					nonSteps=0;
 				}
 				else{
