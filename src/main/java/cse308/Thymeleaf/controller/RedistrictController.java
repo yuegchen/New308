@@ -72,7 +72,7 @@ public class RedistrictController {
 					endingCondition = false;
 					break;
 				case COMPARE:
-					smt.convertAndSend("/redistrict/reply, ");
+					smt.convertAndSend("/redistrict/reply" );
 				default:
 					break;
 			}

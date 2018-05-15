@@ -25,7 +25,7 @@ function setMode(evt, mode) {
     // Call the method to initialize the active tab
     switch (mode) {
         case "redistricting":
-            redistricting(1, null);
+            //redistricting(1, null);
             break;
         case "manual":
             init_manual();
@@ -105,7 +105,7 @@ function setMode(evt, mode) {
         }
 
         $.ajax({
-            url: 'compare-state',
+            url: 'display/state-comparison',
             type: 'GET',
             dataType: 'json',
             success: function(response){
