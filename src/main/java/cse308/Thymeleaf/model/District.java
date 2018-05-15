@@ -1,7 +1,5 @@
 package cse308.Thymeleaf.model;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -126,7 +124,7 @@ public class District {
 			EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
 			EntityManager em = emf.createEntityManager();
 			nDistIdList = (List<Integer>) em.createNativeQuery(
-					"SELECT nd.NDISTRICTID FROM NEIGHBOR_DISTRICT_2 nd WHERE nd.DISTRICT_CD = ?1" + " AND nd.SID = ?2")
+					"SELECT nd.NDISTRICTID FROM NEIGHBOR_DISTRICT nd WHERE nd.DISTRICT_CD = ?1" + " AND nd.SID = ?2")
 					.setParameter(1, districtId).setParameter(2, stateId).getResultList();
 
 			for (int i = 0; i < nDistIdList.size(); i++) {

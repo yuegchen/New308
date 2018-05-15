@@ -46,8 +46,8 @@ public class RedistrictController {
     private boolean isPaused = false;
     private int     stateId;
     private double [] weights;
-    private State originalState;
-    private State newState;
+//    private State originalState;
+//    private State newState;
 
 	@MessageMapping("/redistrict")
 	@SendTo("/redistrict/reply")
@@ -59,11 +59,20 @@ public class RedistrictController {
 			switch(RecoloringOption.valueOf(requestType)){
 				case START:
 					stateId = (int) Double.parseDouble(requestJson.get("stateId").toString());
-					originalState=new State(stateId);
-					newState=new State(stateId);
+//					originalState=new State(stateId);
+//					newState=new State(stateId);
+					System.out.println("stateId: "+stateId);
 					contiguity = (boolean) requestJson.get("contiguity");
 					System.out.println("contiguity: "+contiguity);
 					weights = gson.fromJson(requestJson.get("weights").toString(), double[].class);
+					double total=0;
+					for(double w:weights){
+						total+=w;
+					}
+					for(int i=0;i<weights.length;i++){
+						weights[0]=weights[0]/total;
+						System.out.println("weight "+i+" : "+weights[0]);
+					}
 					endingCondition = true;
 					this.te.execute(new RedistrictingThread());
 					break;
@@ -114,12 +123,12 @@ public class RedistrictController {
 					int maxNonImprovedSteps = ep.getNonImprovedSteps();
 
 					List<District> districts = rh.getDistrictsByState(stateId, em);
-					for(District d:originalState.initDistList()){
-						d.setCompactness(rh.calculateCompactness(d, 1));
-						d.setPopulation(d.getPop());
-						d.setEfficiencyGap(1-rh.calculatePoliticalFairness(d, 1));
-					}
-					newState.setDistList(districts);
+//					for(District d:originalState.initDistList()){
+//						d.setCompactness(rh.calculateCompactness(d, 1));
+//						d.setPopulation(d.getPop());
+//						d.setEfficiencyGap(1-rh.calculatePoliticalFairness(d, 1));
+//					}
+//					newState.setDistList(districts);
 					List<Precinct>[] borderPrecinctsArray = (List<Precinct>[])new List[districts.size()];
 					for(int i = 0; i < districts.size(); i++){
 						borderPrecinctsArray[districts.get(i).getDId()-1] = districts.get(i).initBorderingPrecinctList();
@@ -160,6 +169,7 @@ public class RedistrictController {
 							//Thread.sleep(2000);
 						}
 					}
+					
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -185,7 +195,7 @@ public class RedistrictController {
 				}
 			}
 			for (Precinct precinct : tempBorderPList) {
-				if(!contiguity||rh.checkConstraint(precinct,toDistrict, movedPrecincts)){
+				if(contiguity||rh.checkConstraint(precinct,toDistrict, movedPrecincts)){
 					System.out.println("precinct: " + precinct); 
 					smt.convertAndSend("/redistrict/reply", rh.moveTo(precinct, fromDistrict, toDistrict, false));
 					movedPrecincts.put(precinct.getPid(), toDistrict.getDId());

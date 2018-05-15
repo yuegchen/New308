@@ -1,17 +1,26 @@
 $("select").append($("<option></option>")
     .attr("value", null));
+var stateIds = [];
+$.each(availableGeojsonStateData.features, function(index, json){
+        stateIds.push(parseInt(json.properties.STATE));
+});
+
 $.each(stateNames, function(index, value) {
     var option = $("<option></option>")
         .attr("value", (index + 1))
         .text(value);
-    if(availableGeojsonStateData.features.properties.STATE != (index+1))
         option.disabled = true;
+    if($.inArray(index+1, stateIds))
+        option.disabled = false;
     $("select").append(option);
 });
 
-$('#select:option').on('click', function() {
-    if(('#select:option').val() != null)
-        stateId = $(this).val();
+$('#select').on('change', function() {
+    if($('#select option').val() != null)
+        
+            if($(this).val() == index)
+            	stateId = value;
+       
 });
 
 function setMode(evt, mode) {
@@ -33,7 +42,7 @@ function setMode(evt, mode) {
     // Call the method to initialize the active tab
     switch (mode) {
         case "redistricting":
-            //redistricting(1, null);
+        	redistrict();
             break;
         case "manual":
             init_manual();
@@ -108,8 +117,8 @@ function setMode(evt, mode) {
 
     function compare(){
         var params = {
-            stateId1: $('#select_state_1 option:selected').text();
-            stateId2: $('#select_state_2 option:selected').text();
+            stateId1: $('#select_state_1 option:selected').text(),
+            stateId2: $('#select_state_2 option:selected').text()
         }
 
         $.ajax({
@@ -118,7 +127,7 @@ function setMode(evt, mode) {
             dataType: 'json',
             success: function(response){
 
-            }
+            },
             data: params
         })
     }
