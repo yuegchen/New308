@@ -52,11 +52,26 @@ public class RedistrictHelpers {
 
 	public String moveTo(Precinct precinct, District d1, District d2, boolean out) {
 		List<Precinct> precinctList = d1.initPrecList();
-		precinctList.remove(precinct);
+		System.out.println("size before remove: "+precinctList.size());
+		for(Precinct p:precinctList){
+			if(p.getPid()==precinct.getPid()){
+				
+				precinctList.remove(p);
+				break;
+			}
+		}
+		System.out.println("size after remove: "+precinctList.size());
+//		precinctList.remove(precinct);
 		d1.setPrecinctList(precinctList); 
 		
 		List<Precinct> borderingPrecinctList = d1.initBorderingPrecinctList();
-		borderingPrecinctList.remove(precinct);
+		for(Precinct p:borderingPrecinctList){
+			if(p.getPid()==precinct.getPid()){
+				borderingPrecinctList.remove(p);
+				break;
+			}
+		}
+//		borderingPrecinctList.remove(precinct);
 		d1.setBorderingPrecinctList(borderingPrecinctList);
 		
 		List<Precinct> precinctList2 = d2.initPrecList();
@@ -97,7 +112,7 @@ public class RedistrictHelpers {
 		double r = Math.sqrt(area / Math.PI);
 		double equalAreaPerimeter = 2 * Math.PI * r;
 		double score = 1 / (perimeter / equalAreaPerimeter);
-		System.err.println("score: "+score*weight);
+//		System.err.println("score: "+score*weight);
 		return score*weight;
 	}
 
@@ -117,12 +132,21 @@ public class RedistrictHelpers {
 		double politicalFairness=0;
 		double dem=d1.getDem();
 		double rep=d1.getRep();
-		System.err.println("dem: "+dem);
-		System.err.println("rep: "+rep);
-		if(dem>rep)
-			efficiencyGap=Math.abs(rep-(dem-0.51));
-		else
-			efficiencyGap=Math.abs(dem-(rep-0.51));
+	
+		double demWaste=0;
+		double repWaste=0;
+		
+		if(dem>rep){
+			demWaste+=(dem-0.5);
+			repWaste+=rep;
+		}
+		else{
+			demWaste+=dem;
+			repWaste+=(rep-0.5);
+		}
+		System.err.println("demWaste: "+demWaste);
+		System.err.println("repWaste: "+repWaste);
+		efficiencyGap=Math.abs(demWaste-repWaste);
 		politicalFairness=1-efficiencyGap;
 		System.err.println("politicalFairness: "+politicalFairness*weight);
 		return politicalFairness*weight;

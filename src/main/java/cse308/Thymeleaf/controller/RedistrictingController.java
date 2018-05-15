@@ -261,11 +261,28 @@ public class RedistrictingController {
 	}
 
 	public double calculatePoliticalFairness(District d1, double weight) {
+		double efficiencyGap=0;
 		double politicalFairness=0;
 		double dem=d1.getDem();
 		double rep=d1.getRep();
-		politicalFairness=1-Math.abs(dem-rep);
+	
+		double demWaste=0;
+		double repWaste=0;
 		
+		if(dem>rep){
+			demWaste+=(dem-0.5);
+			repWaste+=rep;
+		}
+		else{
+			demWaste+=dem;
+			repWaste+=(rep-0.5);
+		}
+	
+		System.err.println("demWaste: "+demWaste);
+		System.err.println("repWaste: "+repWaste);
+		efficiencyGap=Math.abs(demWaste-repWaste);
+		politicalFairness=1-efficiencyGap;
+		System.err.println("politicalFairness: "+politicalFairness*weight);
 		return politicalFairness*weight;
 	}
 

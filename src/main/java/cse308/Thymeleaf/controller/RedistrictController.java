@@ -161,11 +161,13 @@ public class RedistrictController {
 			for(Precinct precinct : fromBorderPrecincts){
 				for(Precinct precinct2: toBorderPrecincts){
 				if(precinct.isNeighbor(precinct2.getPid()))
-					tempBorderPList.add(precinct);
+					if(!tempBorderPList.contains(precinct))
+						tempBorderPList.add(precinct);
 				}
 			}
 			for (Precinct precinct : tempBorderPList) {
 				if(rh.checkConstraint(precinct,toDistrict, movedPrecincts)){
+					System.out.println("precinct: " + precinct); 
 					smt.convertAndSend("/redistrict/reply", rh.moveTo(precinct, fromDistrict, toDistrict, false));
 					movedPrecincts.put(precinct.getPid(), toDistrict.getDId());
 					toBorderPrecincts.add(precinct);
@@ -177,6 +179,7 @@ public class RedistrictController {
 				double newScore=rh.calculateGoodness(fromDistrict,toDistrict, weights);
 				System.out.println("new Score: "+newScore);
 				if (newScore > originalScore) {
+					
 					originalScore=newScore;
 					nonSteps=0;
 				}
