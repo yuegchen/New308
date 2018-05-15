@@ -88,18 +88,27 @@ public class RedistrictHelpers {
 	
 	public double calculateCompactness(District d, double weight) throws IOException {
 		double perimeter = d.getPerimeter();
+//		System.err.println("Perimeter: "+perimeter);
+		if(perimeter==0){
+			return 0;
+		}
 		double area = d.getArea();
+//		System.err.println("Area: "+area);
 		double r = Math.sqrt(area / Math.PI);
 		double equalAreaPerimeter = 2 * Math.PI * r;
 		double score = 1 / (perimeter / equalAreaPerimeter);
+		System.err.println("score: "+score*weight);
 		return score*weight;
 	}
 
 	public double calculatePopulation(District d1,District d2, double weight) {
 		double popFairness=0;
-		int firstPop=d1.getPop();
-		int secondPop=d2.getPop();
+		double firstPop=d1.getPop();
+		double secondPop=d2.getPop();
+//		System.err.println("firstPop: "+firstPop);
+//		System.err.println("secondPop: "+secondPop);
 		popFairness=1-Math.abs(firstPop-secondPop)/(firstPop+secondPop);
+//		System.err.println("popFairness: "+popFairness*weight);
 		return popFairness*weight;
 	}
 
@@ -107,8 +116,10 @@ public class RedistrictHelpers {
 		double politicalFairness=0;
 		double dem=d1.getDem();
 		double rep=d1.getRep();
+		System.err.println("dem: "+dem);
+		System.err.println("rep: "+rep);
 		politicalFairness=1-Math.abs(dem-rep);
-		
+		System.err.println("politicalFairness: "+politicalFairness*weight);
 		return politicalFairness*weight;
 	}
 

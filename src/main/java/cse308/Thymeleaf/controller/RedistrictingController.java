@@ -251,9 +251,12 @@ public class RedistrictingController {
 
 	public double calculatePopulation(District d1,District d2, double weight) {
 		double popFairness=0;
-		int firstPop=d1.getPop();
-		int secondPop=d2.getPop();
+		double firstPop=d1.getPop();
+		double secondPop=d2.getPop();
+		System.err.println("firstPop: "+firstPop);
+		System.err.println("secondPop: "+secondPop);
 		popFairness=1-Math.abs(firstPop-secondPop)/(firstPop+secondPop);
+		System.err.println("popFairness: "+popFairness*weight);
 		return popFairness*weight;
 	}
 

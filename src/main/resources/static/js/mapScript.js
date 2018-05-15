@@ -30,6 +30,7 @@ panel_width = 300;
 // This varies by geoJSON file. It could be added to each of them as a property. Given that their formats may differ slightly, it may be easier to alter the formats. We can do this once
 // more states are loaded
 precinctIDString_GEO = "PrecinctID";
+precinctID_Other = "GEOID10";
 stateIDString_GEO = "STATE";
 
 // In the completed build, this information will be specified as a state specific JSON file
@@ -40,12 +41,19 @@ selectedDistrict = -1;
 
 // GLOBAL VARIABLES
 var precinctData = {};
+var precinctDataMA = {};
+var precinctDataCT = {};
+
 var precinctDistricts = {}; // A dictionary that maps precinct ID to district number
 var geojsonUS;
 var geojsonState;
 var geojsonUSLayer;
 var geojsonStateData;
 var geojsonAvailableStateLayer;
+
+//big data file
+var maPrecincts = originalMAGeojsonStateData["features"];
+var ctPrecincts = originalCTGeojsonStateData["features"];
 
 // ==============================================================================
 // ===== START OF UI PANEL FUNCTIONS ============================================
@@ -85,10 +93,12 @@ function panelSelectDistrict(district) {
 // ==============================================================================
 
 // Get the HTML code for the info panel that represents a district
-function getInfo(PrecinctID) {
+function getInfoMN(PrecinctID) {
     var myData = precinctData[PrecinctID];
     var toReturn = '';
     var statNames = Object.keys(stateSyntax);
+    // console.log(statNames);
+    // console.log(myData);
     for (var i = 0; i < statNames.length; i++) {
         var statName = statNames[i];
         toReturn += "<br>";
@@ -98,6 +108,56 @@ function getInfo(PrecinctID) {
     toReturn += "<br><b>District</b>: " + precinctDistricts[myData[stateSyntax[precinctID_NAME]]];
     return toReturn;
 }
+function getInfoOther(PrecinctID) {
+    // console.log(typeof(PrecinctID));
+    // console.log(PrecinctID);
+    if(PrecinctID.indexOf('2') != 0) {
+        //load ct
+        var myData = precinctDataCT[PrecinctID];
+        // console.log(myData);
+        var toReturn = '';
+        var statNames = Object.keys(stateSyntaxCT);
+        // console.log(statNames);
+        // console.log(myData);
+        for (var i = 0; i < statNames.length; i++) {
+            var statName = statNames[i];
+            toReturn += "<br>";
+            toReturn += "<b>" + statName + "</b>: ";
+            toReturn += myData[stateSyntaxCT[statName]];
+        }
+    } else {
+        //load ma
+        var myData = precinctDataMA[PrecinctID];
+        // console.log(myData);
+        var toReturn = '';
+        var statNames = Object.keys(stateSyntaxMA);
+        // console.log(statNames);
+        // console.log(myData);
+        for (var i = 0; i < statNames.length; i++) {
+            var statName = statNames[i];
+            toReturn += "<br>";
+            toReturn += "<b>" + statName + "</b>: ";
+            toReturn += myData[stateSyntaxMA[statName]];
+        }
+    }
+    // var myData = precinctDataCT[PrecinctID];
+    // console.log(myData);
+    // var toReturn = '';
+    // var statNames = Object.keys(stateSyntaxCT);
+    // // console.log(statNames);
+    // // console.log(myData);
+    // for (var i = 0; i < statNames.length; i++) {
+    //     var statName = statNames[i];
+    //     toReturn += "<br>";
+    //     toReturn += "<b>" + statName + "</b>: ";
+    //     toReturn += myData[stateSyntaxCT[statName]];
+    // }
+    // toReturn += "<br><b>District</b>: " + precinctDistricts[myData[stateSyntax[precinctID_NAME]]];
+    return toReturn;
+}
+
+
+
 
 function redraw() {
     geojsonState.setStyle(styleStateShow);
@@ -140,7 +200,7 @@ function setPrecinctDistrict(precinctID, district) {
 // ==============================================================================
 
 // Create a dictionary typing precinct names to JSON data and populate it
-function resetState() {
+function resetStateMN() {
     for (var i = 0; i < dataTwentySixteen.length; i++) {
         var cur = dataTwentySixteen[i];
         // Tie precinct ID to stats;
@@ -148,7 +208,30 @@ function resetState() {
         precinctDistricts[cur[stateSyntax[precinctID_NAME]]] = cur[stateSyntax[precinctOrigDist_NAME]];
     }
 }
-resetState();
+resetStateMN();
+
+function resetStateCT() {
+    for (var i = 0; i < ctPrecincts.length; i++) {
+        var cur = ctPrecincts[i].properties;
+        // Tie precinct ID to stats;
+        precinctDataCT[cur[stateSyntaxCT[precinctID_NAME]]] = cur;
+        // console.log(cur);
+        // precinctDistricts[cur[stateSyntaxCT[precinctID_NAME]]] = cur[stateSyntax[precinctOrigDist_NAME]];
+    }
+    // console.log(precinctDataCT);
+}
+resetStateCT();
+
+function resetStateMA() {
+    for (var i = 0; i < maPrecincts.length; i++) {
+        var cur = maPrecincts[i].properties;
+        // Tie precinct ID to stats;
+        precinctDataMA[cur[stateSyntaxMA[precinctID_NAME]]] = cur;
+        // precinctDistricts[cur[stateSyntax[precinctID_NAME]]] = cur[stateSyntax[precinctOrigDist_NAME]];
+    }
+}
+resetStateMA();
+
 
 // ==============================================================================
 // ===== INTERFACE FUNCTIONS ====================================================
@@ -235,7 +318,12 @@ function highlightFeature(e) {
     if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
         layer.bringToFront();
     }
+    // console.log(layer);
+    
     info.update(layer.feature.properties);
+    
+
+    
 }
 
 
@@ -254,7 +342,9 @@ function highlightUSOrAvailableStateFeature(e) {
 }
 
 function resetHighlight(e) {
-    geojsonState.setStyle(styleStateShow);
+    for (var i = geojsonState.length - 1; i >= 0; i--) {
+        geojsonState[i].setStyle(styleStateShow);
+    }
     // Clear information display
     info.update();
 }
@@ -338,12 +428,22 @@ geojsonUS = L.geoJSON(geojsonUSData, {
 });
 geojsonUS.addTo(myMap);
 
-geojsonStateData = $.extend(true, {}, originalMNGeojsonStateData);
-geojsonState = L.geoJSON(geojsonStateData, {
+geojsonStateData = [];
+geojsonState = [];
+geojsonStateData[0] = $.extend(true, {}, originalMNGeojsonStateData);
+geojsonStateData[1] = $.extend(true, {}, originalMAGeojsonStateData);
+geojsonStateData[2] = $.extend(true, {}, originalCTGeojsonStateData);
+
+for (var i = geojsonStateData.length - 1; i >= 0; i--) {
+    geojsonState[i] = L.geoJSON(geojsonStateData[i], {
     onEachFeature: onEachFeatureState
-});
-geojsonState.addTo(myMap);
-geojsonState.setStyle(styleStateHidden);
+    });
+    geojsonState[i].addTo(myMap);
+    geojsonState[i].setStyle(styleStateHidden);
+}
+
+
+
 
 geojsonUSLayer = L.geoJSON(geojsonUSData, {
     style: styleUS,
@@ -359,8 +459,10 @@ geojsonAvailableStateLayer.addTo(myMap);
 
 
 myMap.on('zoomend', function(e) {
-    if (myMap.getZoom() >= myMap.getBoundsZoom(geojsonState.getBounds())) {
-        geojsonState.setStyle(styleStateShow);
+    if (myMap.getZoom() >= myMap.getBoundsZoom(geojsonState[0].getBounds())) {
+        for (var i = geojsonState.length - 1; i >= 0; i--) {
+            geojsonState[i].setStyle(styleStateShow);
+        }
 
         if (myMap.hasLayer(geojsonUSLayer)) {
             myMap.removeLayer(geojsonUSLayer);
@@ -370,7 +472,9 @@ myMap.on('zoomend', function(e) {
         }
 
     } else {
-        geojsonState.setStyle(styleStateHidden);
+        for (var i = geojsonState.length - 1; i >= 0; i--) {
+            geojsonState[i].setStyle(styleStateHidden);
+        }
         geojsonUSLayer.addTo(myMap);
         geojsonUSLayer.setStyle(styleUS);
 
@@ -390,7 +494,19 @@ info.onAdd = function(myMap) {
 };
 
 info.update = function(props) {
-    this._div.innerHTML = '<h4>Precinct Stats</h4>' + (props ? getInfo(props[precinctIDString_GEO]) : 'Hover over a polling district');
+    // console.log(props);
+    if (props != null) {
+        if (props["STATEFP1_1"] != null) {
+            this._div.innerHTML = '<h4>Precinct Stats</h4>' + (props ? getInfoOther(props[precinctID_Other]) : 'Hover over a polling district');    
+        } else {
+            this._div.innerHTML = '<h4>Precinct Stats</h4>' + (props ? getInfoMN(props[precinctIDString_GEO]) : 'Hover over a polling district');    
+        }
+    } else {
+        this._div.innerHTML = '<h4>Precinct Stats</h4>' + (props ? getInfoMN(props[precinctIDString_GEO]) : 'Hover over a polling district');    
+    }
+    
+    
+
 };
 
 info.addTo(myMap);
@@ -406,7 +522,9 @@ var resetControl = L.Control.extend({
         resetButton = L.DomUtil.create('button', 'reset', container);
         resetButton.textContent = "Reset";
         resetButton.onclick = function() {
-            resetState();
+            //resetStateCT()
+            //resetStateMA()
+            resetStateMN();
             redraw();
 
         };
