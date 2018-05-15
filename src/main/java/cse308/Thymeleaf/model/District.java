@@ -49,7 +49,13 @@ public class District {
 																			// id
 
 	@Transient
-	private List<Precinct> borderingPrecinctList = new ArrayList<Precinct>();;
+	private List<Precinct> borderingPrecinctList = new ArrayList<Precinct>();
+	@Transient
+	private double compactness;
+	@Transient
+	private int population;
+	@Transient
+	private double efficiencyGap;
 
 	@Transient
 	private List<Precinct> precinctList = new ArrayList<Precinct>(); // store
@@ -57,7 +63,7 @@ public class District {
 																		// with
 																		// their
 																		// id
-
+	
 	@Transient
 	private List<Integer> nDistIdList = new ArrayList<Integer>();
 	@Transient
@@ -81,7 +87,31 @@ public class District {
 	public District() {
 		super();
 	}
+	
+	public double getCompactness() {
+		return compactness;
+	}
 
+	public void setCompactness(double compactness) {
+		this.compactness = compactness;
+	}
+
+	public double getEfficiencyGap() {
+		return efficiencyGap;
+	}
+
+	public void setEfficiencyGap(double efficiencyGap) {
+		this.efficiencyGap = efficiencyGap;
+	}
+	
+	public int getPopulation() {
+		return getPop();
+	}
+
+	public void setPopulation(int pop) {
+		this.population = pop;
+	}
+	
 	public List<Integer> getIntoPList() {
 		return movedIntoPrecinctList;
 	}

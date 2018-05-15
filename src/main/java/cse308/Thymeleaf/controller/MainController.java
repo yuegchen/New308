@@ -121,6 +121,7 @@ public class MainController {
 //		model.addAttribute("verifyForm", verifyForm);
 		return "verify";
 	}
+
 //	@RequestMapping(value = { "/verify" }, method = RequestMethod.POST)
 //	public String verify(Model model, 
 //			@ModelAttribute("verifyForm") VerifyForm verifyForm) {
@@ -594,23 +595,23 @@ public class MainController {
 		State state = new State(27);
 
 		state.initiNeighborPrecincts();
-//		state.initiBorderingPrecincts();
-//		List<District> districts = state.initDistList();
-////		System.out.println("Started");
-//		
-//		for(District district: districts){
-//			System.err.println(district.getDId());
-//			List<Precinct> precincts = district.initPrecList();
-//			for(Precinct precinct: precincts){
-//				System.err.println(precinct.getPid());
-//				try {
-//					System.out.println(precinct.initArea());
-//				} catch (IOException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//			}
-//		}
+		state.initiBorderingPrecincts();
+		List<District> districts = state.initDistList();
+//		System.out.println("Started");
+		
+		for(District district: districts){
+			System.err.println(district.getDId());
+			List<Precinct> precincts = district.initPrecList();
+			for(Precinct precinct: precincts){
+				System.err.println(precinct.getPid());
+				try {
+					System.out.println(precinct.initArea());
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
 		return new Gson().toJson("{'state' : 'okay'}");
 		
 	}
