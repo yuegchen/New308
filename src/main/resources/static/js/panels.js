@@ -63,7 +63,7 @@ function setMode(evt, mode) {
     function init_manual() {
         // Make sure the map is coloring by district affiliation
         setColoring(getColor_District);
-        redraw();
+        // redraw();
 
         // Populate the div with content
         var ele = document.getElementById("district_container");

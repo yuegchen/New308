@@ -13,6 +13,7 @@ import cse308.Thymeleaf.form.PropertyForm;
 import cse308.Thymeleaf.form.RedistrictingForm;
 import cse308.Thymeleaf.form.RegisterForm;
 import cse308.Thymeleaf.form.SelectUserForm;
+import cse308.Thymeleaf.form.VerifyForm;
 //import cse308.Thymeleaf.form.VerifyForm;
 import cse308.Thymeleaf.model.*;
 
@@ -117,49 +118,51 @@ public class MainController {
 	public String showVerifyPage(Model model) {
 		model.addAttribute("user", user);
 		model.addAttribute("login", login);
-//		VerifyForm verifyForm = new VerifyForm();
-//		model.addAttribute("verifyForm", verifyForm);
+		VerifyForm verifyForm = new VerifyForm();
+		model.addAttribute("verifyForm", verifyForm);
 		return "verify";
 	}
 
-//	@RequestMapping(value = { "/verify" }, method = RequestMethod.POST)
-//	public String verify(Model model, 
-//			@ModelAttribute("verifyForm") VerifyForm verifyForm) {
-//
-//		String token = verifyForm.getToken();
-//
-//		if (user.getToken().compareTo(token) == 0 ) {
-//			//success
-//			
-//		} else {
-//			//fail
-//		}
+	@RequestMapping(value = { "/verify" }, method = RequestMethod.POST)
+	public String verify(Model model, 
+			@ModelAttribute("verifyForm") VerifyForm verifyForm) {
+
+		String token = verifyForm.getToken();
+
+		if (user.getToken().compareTo(token) == 0 ) {
+			//success
+			return "UserCenter"
+			
+		} else {
+			//fail
+			return "UserCenter"
+		}
 		
 		
-//		//generate token
-//		String token = randomToken.getToken(6);
-//		//send email
-//		emailC.triggerEmail(email, token);
-//		
-//		user = new User();
-//
-//		user.setUname(uname);
-//		user.setEmail(email);
-//		user.setPwd(Encrypt.encrypt(pwd));
-//		user.setPhone(phone);
-//		user.setAddress(address);
-//		user.setToken(token);
-//		entitymanager.getTransaction().begin();
-//		entitymanager.persist(user);
-//		entitymanager.getTransaction().commit();
-//
-//		entitymanager.close();
-//		emfactory.close();
-//		login="yes";
-//		model.addAttribute("user", user);
-//		return "UserCenter";
-//	}
-//	
+		// //generate token
+		// String token = randomToken.getToken(6);
+		// //send email
+		// emailC.triggerEmail(email, token);
+		
+		// user = new User();
+
+		// user.setUname(uname);
+		// user.setEmail(email);
+		// user.setPwd(Encrypt.encrypt(pwd));
+		// user.setPhone(phone);
+		// user.setAddress(address);
+		// user.setToken(token);
+		// entitymanager.getTransaction().begin();
+		// entitymanager.persist(user);
+		// entitymanager.getTransaction().commit();
+
+		// entitymanager.close();
+		// emfactory.close();
+		// login="yes";
+		// model.addAttribute("user", user);
+		// return "UserCenter";
+	}
+	
 	
 	@RequestMapping(value = { "/viewStatistics" }, method = RequestMethod.GET)
 	public String showViewStatisticsPage(Model model) {

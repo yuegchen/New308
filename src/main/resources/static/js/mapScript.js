@@ -160,9 +160,11 @@ function getInfoOther(PrecinctID) {
 
 
 function redraw() {
-    for (var i = geojsonState.length - 1; i >= 0; i--) {
-        geojsonState[i].setStyle(styleStateShow);
-    }
+
+    
+        getjsonState.setStyle(styleStateShow);
+    
+
     
 }
 
