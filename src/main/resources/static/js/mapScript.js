@@ -319,6 +319,7 @@ function styleAvailableState(feature) {
 
 function highlightFeature(e) {
     var layer = e.target;
+    console.log("hovered");
     layer.setStyle({
         weight: 2,
         color: selectionColor,

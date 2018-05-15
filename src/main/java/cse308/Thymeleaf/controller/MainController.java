@@ -121,6 +121,7 @@ public class MainController {
 		model.addAttribute("verifyForm", verifyForm);
 		return "verify";
 	}
+	
 	@RequestMapping(value = { "/verify" }, method = RequestMethod.POST)
 	public String verify(Model model, 
 			@ModelAttribute("verifyForm") VerifyForm verifyForm) {
