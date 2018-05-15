@@ -71,8 +71,8 @@ public class RedistrictController {
 						total+=w;
 					}
 					for(int i=0;i<weights.length;i++){
-						weights[0]=weights[0]/total;
-						System.out.println("weight "+i+" : "+weights[0]);
+						weights[i]=weights[i]/total;
+						System.out.println("weight "+i+" : "+weights[i]);
 					}
 					endingCondition = true;
 					while(true){
@@ -202,7 +202,7 @@ public class RedistrictController {
 				}
 			}
 			for (Precinct precinct : tempBorderPList) {
-				if(contiguity||rh.checkConstraint(precinct,toDistrict, movedPrecincts)){
+				if(!contiguity||rh.checkConstraint(precinct,toDistrict, movedPrecincts)){
 					System.out.println("precinct: " + precinct); 
 					smt.convertAndSend("/redistrict/reply", rh.moveTo(precinct, fromDistrict, toDistrict, false));
 					movedPrecincts.put(precinct.getPid(), toDistrict.getDId());
