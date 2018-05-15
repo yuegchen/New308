@@ -13,7 +13,7 @@ import cse308.Thymeleaf.form.PropertyForm;
 import cse308.Thymeleaf.form.RedistrictingForm;
 import cse308.Thymeleaf.form.RegisterForm;
 import cse308.Thymeleaf.form.SelectUserForm;
-import cse308.Thymeleaf.form.VerifyForm;
+//import cse308.Thymeleaf.form.VerifyForm;
 import cse308.Thymeleaf.model.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,23 +117,23 @@ public class MainController {
 	public String showVerifyPage(Model model) {
 		model.addAttribute("user", user);
 		model.addAttribute("login", login);
-		VerifyForm verifyForm = new VerifyForm();
-		model.addAttribute("verifyForm", verifyForm);
+//		VerifyForm verifyForm = new VerifyForm();
+//		model.addAttribute("verifyForm", verifyForm);
 		return "verify";
 	}
-	
-	@RequestMapping(value = { "/verify" }, method = RequestMethod.POST)
-	public String verify(Model model, 
-			@ModelAttribute("verifyForm") VerifyForm verifyForm) {
 
-		String token = verifyForm.getToken();
-
-		if (user.getToken().compareTo(token) == 0 ) {
-			//success
-			
-		} else {
-			//fail
-		}
+//	@RequestMapping(value = { "/verify" }, method = RequestMethod.POST)
+//	public String verify(Model model, 
+//			@ModelAttribute("verifyForm") VerifyForm verifyForm) {
+//
+//		String token = verifyForm.getToken();
+//
+//		if (user.getToken().compareTo(token) == 0 ) {
+//			//success
+//			
+//		} else {
+//			//fail
+//		}
 		
 		
 //		//generate token
@@ -157,9 +157,9 @@ public class MainController {
 //		emfactory.close();
 //		login="yes";
 //		model.addAttribute("user", user);
-		return "UserCenter";
-	}
-	
+//		return "UserCenter";
+//	}
+//	
 	
 	@RequestMapping(value = { "/viewStatistics" }, method = RequestMethod.GET)
 	public String showViewStatisticsPage(Model model) {
@@ -590,17 +590,40 @@ public class MainController {
 		}
 	}
 
-	
-	@RequestMapping(value = {"/dataInitialization"}, method = RequestMethod.GET)
-	public String initData() throws IOException{
+	@RequestMapping(value = {"/dataInitializatio1"}, method = RequestMethod.GET)
+	public String initData1() throws IOException{
 		State state = new State(9);
-
-		System.err.println("Passed");
 
 		state.initiNeighborPrecincts();
 		state.initiBorderingPrecincts();
 		List<District> districts = state.initDistList();
-		System.out.println("Started");
+//		System.out.println("Started");
+		
+		for(District district: districts){
+			System.err.println(district.getDId());
+			List<Precinct> precincts = district.initPrecList();
+			for(Precinct precinct: precincts){
+				System.err.println(precinct.getPid());
+				try {
+					System.out.println(precinct.initArea());
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		return new Gson().toJson("{'state' : 'okay'}");
+		
+	}	
+	
+	@RequestMapping(value = {"/dataInitialization2"}, method = RequestMethod.GET)
+	public String initData2() throws IOException{
+		State state = new State(27);
+
+		state.initiNeighborPrecincts();
+		state.initiBorderingPrecincts();
+		List<District> districts = state.initDistList();
+//		System.out.println("Started");
 		
 		for(District district: districts){
 			System.err.println(district.getDId());

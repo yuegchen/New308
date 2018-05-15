@@ -41,6 +41,7 @@ public class RedistrictController {
     private SimpMessagingTemplate smt;
     
     private boolean endingCondition = true;
+    private boolean contiguity = true;
     private boolean isPaused = false;
     private int     stateId;
     private double [] weights;
@@ -55,6 +56,7 @@ public class RedistrictController {
 			switch(RecoloringOption.valueOf(requestType)){
 				case START:
 					stateId = (int) Double.parseDouble(requestJson.get("stateId").toString());
+					contiguity = (boolean) requestJson.get("contiguity");
 					weights = gson.fromJson(requestJson.get("weights").toString(), double[].class);
 					endingCondition = true;
 					this.te.execute(new RedistrictingThread());
@@ -69,6 +71,8 @@ public class RedistrictController {
 					isPaused = false;
 					endingCondition = false;
 					break;
+				case COMPARE:
+					smt.convertAndSend("/redistrict/reply" );
 				default:
 					break;
 			}
@@ -96,7 +100,8 @@ public class RedistrictController {
 		@SuppressWarnings("unchecked")
 		@Override
 		public void run(){
-			while(endingCondition){
+			end_redistricting:
+			if(endingCondition){
 				try {
 					ExternalProperties ep = new ExternalProperties();
 					int maxMoves = ep.getMaxMoves();
@@ -120,7 +125,6 @@ public class RedistrictController {
 							}
 						}
 					}
-					end_redistricting:
 					if(steps < maxMoves && nonSteps < maxNonImprovedSteps){
 						for(Map<District, District> map : neighborDistrictPairs){	
 							while(isPaused){
@@ -136,8 +140,11 @@ public class RedistrictController {
 								endingCondition = false;
 								break end_redistricting;
 							}
-							for(Map.Entry<District, District> entry: map.entrySet())
+							for(Map.Entry<District, District> entry: map.entrySet()){
 								tryMove(borderPrecinctsArray, entry.getKey(), entry.getValue());
+								if(endingCondition)
+									break end_redistricting;
+							}
 							//Thread.sleep(2000);
 						}
 					}
@@ -166,7 +173,7 @@ public class RedistrictController {
 				}
 			}
 			for (Precinct precinct : tempBorderPList) {
-				if(rh.checkConstraint(precinct,toDistrict, movedPrecincts)){
+				if(!contiguity||rh.checkConstraint(precinct,toDistrict, movedPrecincts)){
 					System.out.println("precinct: " + precinct); 
 					smt.convertAndSend("/redistrict/reply", rh.moveTo(precinct, fromDistrict, toDistrict, false));
 					movedPrecincts.put(precinct.getPid(), toDistrict.getDId());
