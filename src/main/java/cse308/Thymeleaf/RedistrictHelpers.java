@@ -105,10 +105,10 @@ public class RedistrictHelpers {
 		double popFairness=0;
 		double firstPop=d1.getPop();
 		double secondPop=d2.getPop();
-		System.err.println("firstPop: "+firstPop);
-		System.err.println("secondPop: "+secondPop);
+//		System.err.println("firstPop: "+firstPop);
+//		System.err.println("secondPop: "+secondPop);
 		popFairness=1-Math.abs(firstPop-secondPop)/(firstPop+secondPop);
-		System.err.println("popFairness: "+popFairness*weight);
+//		System.err.println("popFairness: "+popFairness*weight);
 		return popFairness*weight;
 	}
 
@@ -116,8 +116,10 @@ public class RedistrictHelpers {
 		double politicalFairness=0;
 		double dem=d1.getDem();
 		double rep=d1.getRep();
+		System.err.println("dem: "+dem);
+		System.err.println("rep: "+rep);
 		politicalFairness=1-Math.abs(dem-rep);
-		
+		System.err.println("politicalFairness: "+politicalFairness*weight);
 		return politicalFairness*weight;
 	}
 
