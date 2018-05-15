@@ -2,6 +2,7 @@ package cse308.Thymeleaf.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -92,6 +93,7 @@ public class RedistrictController {
 		private int	steps = 0;
 		private int nonSteps = 0;
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public void run(){
 			while(endingCondition){
@@ -101,29 +103,40 @@ public class RedistrictController {
 					int maxNonImprovedSteps = ep.getNonImprovedSteps();
 
 					List<District> districts = rh.getDistrictsByState(stateId, em);
-
+					List<Precinct>[] borderPrecinctsArray = (List<Precinct>[])new List[districts.size()];
+					for(int i = 0; i < districts.size(); i++){
+						borderPrecinctsArray[districts.get(i).getDId()-1] = districts.get(i).initBorderingPrecinctList();
+					}
+					List<Map<District, District>> neighborDistrictPairs = new ArrayList<Map<District, District>>();
+					for(District fromDistrict : districts){
+						for(District toDistrict : districts){
+							System.out.println("fromDistrictId: " + fromDistrict.getDId() + " ToDistrictId: " + toDistrict.getDId());
+							System.out.println("fromDistrict: " + fromDistrict + " ToDistrict: " + toDistrict);
+							System.out.println("checked"); 
+							if(fromDistrict.isNeighbor(toDistrict.getDId())){
+								Map<District, District> neighborDistrictMapping = new HashMap<District, District>();
+								neighborDistrictMapping.put(fromDistrict, toDistrict);
+								neighborDistrictPairs.add(neighborDistrictMapping);
+							}
+						}
+					}
 					end_redistricting:
 					if(steps < maxMoves && nonSteps < maxNonImprovedSteps){
-						for(District district:districts){
-							List<Precinct> borderPrecincts = district.initBorderingPrecinctList();
-							List<District> neighborDistricts = district.getNeighborDistricts();
-
-							for(District to : neighborDistricts){
-								while(isPaused){
-									Thread.sleep(1000);
-								}
-								if(steps >= maxMoves){
-									System.err.println("steps exceeds MAX_MOVES");
-									break end_redistricting;
-								}
-								if(nonSteps >= maxNonImprovedSteps){
-									System.err.println("non-steps exceeds MAX_NON_IMPROVED_STEPS");
-									break end_redistricting;
-								}
-								tryMove(borderPrecincts,district,to);
-								System.err.println("______________________");
-								Thread.sleep(2000);
+						for(Map<District, District> map : neighborDistrictPairs){	
+							while(isPaused){
+								Thread.sleep(1000);
 							}
+							if(steps >= maxMoves){
+								System.err.println("steps exceeds MAX_MOVES");
+								break end_redistricting;
+							}
+							if(nonSteps >= maxNonImprovedSteps){
+								System.err.println("non-steps exceeds MAX_NON_IMPROVED_STEPS");
+								break end_redistricting;
+							}
+							for(Map.Entry<District, District> entry: map.entrySet())
+								tryMove(borderPrecinctsArray, entry.getKey(), entry.getValue());
+							//Thread.sleep(2000);
 						}
 					}
 				} catch (InterruptedException e) {
@@ -136,16 +149,25 @@ public class RedistrictController {
 			}
 		}
 
-		private void tryMove(List<Precinct> borderPrecinctList,District fromDistrict, District toDistrict) throws IOException {
+		private void tryMove(List<Precinct>[] borderPrecinctsArray,District fromDistrict, District toDistrict) throws IOException {
 			double originalScore=rh.calculateGoodness(fromDistrict, toDistrict, weights);
 			System.out.println("originalScore: "+originalScore);
+			Map<Integer, Integer> movedPrecincts = new HashMap<Integer, Integer>();
+			List<Precinct> fromBorderPrecincts = borderPrecinctsArray[fromDistrict.getDId()-1];
+			List<Precinct> toBorderPrecincts = borderPrecinctsArray[toDistrict.getDId()-1];
 			List<Precinct> tempBorderPList=new ArrayList<Precinct>();
-			for(Precinct precinct : borderPrecinctList){
-				tempBorderPList.add(precinct);
+			for(Precinct precinct : fromBorderPrecincts){
+				for(Precinct precinct2: toBorderPrecincts){
+				if(precinct.isNeighbor(precinct2.getPid()))
+					tempBorderPList.add(precinct);
+				}
 			}
 			for (Precinct precinct : tempBorderPList) {
-				if(rh.checkConstraint(precinct,toDistrict)){
+				if(rh.checkConstraint(precinct,toDistrict, movedPrecincts)){
 					smt.convertAndSend("/redistrict/reply", rh.moveTo(precinct, fromDistrict, toDistrict, false));
+					movedPrecincts.put(precinct.getPid(), toDistrict.getDId());
+					toBorderPrecincts.add(precinct);
+					fromBorderPrecincts.remove(precinct);
 					steps++;
 				} 
 				else
@@ -158,9 +180,13 @@ public class RedistrictController {
 				}
 				else{
 					nonSteps++;
-					smt.convertAndSend("/redistrict/reply", rh.moveTo(precinct, toDistrict, fromDistrict, false)); 
+					smt.convertAndSend("/redistrict/reply", rh.moveTo(precinct, toDistrict, fromDistrict, true)); 
+					movedPrecincts.put(precinct.getPid(), fromDistrict.getDId());
+					fromBorderPrecincts.add(precinct);
+					toBorderPrecincts.remove(precinct);
 				}
 			}
+			
 		}
 	}
 }

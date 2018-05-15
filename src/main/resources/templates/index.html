@@ -18,7 +18,9 @@
          crossorigin=""></script>
       <!-- jquery -->
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+      <!-- SockJS -->
       <script type="text/javascript" th:src="@{/js/SockJS.js}"></script>
+      <script type="text/javascript" th:src="@{/js/slideIn.js}"></script>
   	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
    </head>
    <script language="javascript" type="text/javascript">
@@ -26,8 +28,8 @@
 		function About_onclick() {
 			window.open("about","_self");
 		}
-		function Verify_onclick() {
-			window.open("verify","_self");
+		function View_onclick() {
+			window.open("viewStatistics","_self");
 		}
 		function Index_onclick() {
 		    window.open("index","_self");
@@ -68,7 +70,7 @@
 		    	ws.send('/app/redistrict', {}, JSON.stringify({
 		    		"request": "start", 
 		    		"stateId": 27, 
-		    		"weights": [1, 0, 0, 0, 0]
+		    		"weights": [0, 1, 0]
 		    	}));
 	    	}
 	    }
@@ -98,9 +100,7 @@
    	 <div class="w3-bar w3-white w3-large">
             <button class="w3-bar-item w3-button w3-yellow w3-mobile" type="submit" onclick="return Index_onclick()"><i class="w3-margin-right"></i> DogOwners</button>
             <button class="w3-bar-item w3-button w3-mobile" type="submit" onclick="return About_onclick()"><i class="w3-margin-right"></i>About Us</button>
-            <button class="w3-bar-item w3-button w3-mobile" type="submit" onclick="return Verify_onclick()"><i class="w3-margin-right"></i>Verify</button>
-            
-            <button class="w3-bar-item w3-button w3-mobile" type="submit" onclick="return Feedback_onclick()"><i class="w3-margin-right"></i>Leave Feedback</button>
+           
 	    <div style=" width: 100%;  position: absolute; top: -18px;height: 40px;" th:switch="${login}"> 
   			<p th:case="'no'"><a  class="w3-bar-item w3-button w3-right w3-light-grey w3-mobile w3-margin-right" th:href="@{/login}">Login/Register</a> </p>
   			<p th:case="'yes'">	<a class="w3-bar-item w3-button w3-right w3-mobile w3-margin-right" th:href="@{/profile}">Profile</a> </p> 
@@ -129,9 +129,7 @@
 					<div id="redistrict_container">
 						<p>Compactness: </p><input type="range" min="1" max="100" value="50" class="slider" id="compactness">
 						<p>Population: </p><input type="range" min="1" max="100" value="50" class="slider" id="population">
-						<p>Contiguity: </p><input type="range" min="1" max="100" value="50" class="slider" id="contiguity">
 						<p>Partisan Fairness: </p><input type="range" min="1" max="100" value="50" class="slider" id="partisan">
-						<p>Racial Fairness: </p><input type="range" min="1" max="100" value="50" class="slider" id="racial">
 						<button style="margin: 15px auto; display:block;" class="tab_button" onclick="setMode(event, '')">Generate</button>
 	  				</div>
 				</div>

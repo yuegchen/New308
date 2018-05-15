@@ -33,8 +33,7 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
 	 
 <!-- Navigation Bar -->
 <div class="w3-bar w3-white w3-large">
-  	<button class="w3-bar-item w3-button w3-yellow w3-mobile" type="submit" onclick="return Index_onclick()"><i class="w3-margin-right"></i> DogOwner</button>
-    <button class="w3-bar-item w3-button w3-mobile" type="submit" onclick="return About_onclick()"><i class="w3-margin-right"></i>About Us</button>
+  	<button class="w3-bar-item w3-button w3-yellow w3-mobile" type="submit" onclick="history.back()"><i class="w3-margin-right"></i> DogOwner</button>
 	<a  class="fa fa-times-circle-o w3-bar-item w3-button w3-right  w3-mobile" th:href="@{/logout}"></a>
 </div>
 <!-- Page Container -->
@@ -47,14 +46,10 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
         <div class="w3-display-container">
           <img th:src="@{/image/dog.jpg}" style="width:100%" alt="Avatar">
           <div class="w3-display-bottomleft w3-container w3-text-black">
-            <h2 th:utext="${user.uname}">...</h2>
+            
           </div>
-        </div>
-     <div class="w3-container">
-          <p><i class="fa fa-briefcase fa-fw w3-margin-right w3-large w3-text-teal"></i>Customer</p>
-          <p><i class="fa fa-home fa-fw w3-margin-right w3-large w3-text-teal"></i>Address:	<t5 th:utext="${user.address}">...</t5></p>
-          <p><i class="fa fa-envelope fa-fw w3-margin-right w3-large w3-text-teal"></i>Email:	<t5 th:utext="${user.email}">...</t5></p>	
-          <p><i class="fa fa-mobile-phone fa-fw w3-margin-right w3-large w3-text-teal"></i>Phone:	<t5 th:utext="${user.phone}">...</t5></p>
+          <h2 >Web Statistics</h2>
+            <h2 >States which are actively being redistricted</h2>
         </div>
       </div><br>
     <!-- End Left Column -->
@@ -62,82 +57,29 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
     <!-- Right Column -->
     <div class="w3-twothird"> 
       <div class="w3-container w3-card w3-white w3-margin-bottom">
-        <h2 class="w3-text-grey w3-padding-16"><i class="fa fa-suitcase fa-fw w3-margin-right w3-xxlarge w3-text-teal"></i>Redistricting History</h2>
+      <button class="w3-button w3-dark-grey" type="button" name="back" onclick="history.back()">Back</button>
+        <h2 class="w3-text-grey w3-padding-16"><i class="fa fa-suitcase fa-fw w3-margin-right w3-xxlarge w3-text-teal"></i>States</h2>
         <div class="w3-container">     
         <div class="w3-responsive" style="width:700px; height:500px;">
   			<table class="w3-table-all">
            <tr>
-              <th>Plan Name</th>
-              <th>Redistricting Data</th>
-              <th>Priority Factor</th>
-              <th>Created Date</th>
+              <th>Minnesota</th>
+              <th>Connecticut</th>
+              <th>Massachusetts</th>
            </tr>
            <tr>
               <td>
-                 <div class="w3-bar w3-light-grey">
-                    <button onclick="return Index_onclick()">MN State Plan 1</button>
-                 </div>
+          			<h2 th:utext="${s.minnesota}">...</h2>
+              </td>
+              <td>
+              		<h2 th:utext="${s.connecticut}">...</h2>
               </td>
               <td>
                  <div class="w3-bar w3-light-grey">
-                    <button>Download</button>
+                  <h2 th:utext="${s.massachusetts}">...</h2>
                  </div>
               </td>
-              <td>
-                 <div class="w3-bar w3-light-grey">
-                  Racial Fairness
-                 </div>
-              </td>
-              <td>
-                 <div class="w3-bar w3-light-grey">
-                  11/22/2018 at 10:00
-                 </div>
-              </td>
-           </tr>
-           <tr>
-              <td>
-                 <div class="w3-bar w3-light-grey">
-                    <button onclick="return Index_onclick()">MN State Plan 2</button>
-                 </div>
-              </td>
-              <td>
-                 <div class="w3-bar w3-light-grey">
-                    <button >Download</button>
-                 </div>
-              </td>
-              <td>
-                 <div class="w3-bar w3-light-grey">
-                  Population 
-                 </div>
-              </td>
-              <td>
-                 <div class="w3-bar w3-light-grey">
-                  03/04/2018 at 13:33
-                 </div>
-              </td>
-           </tr>
-           <tr>
-              <td>
-                 <div class="w3-bar w3-light-grey">
-                    <button onclick="return Index_onclick()">MN State Plan 3</button>
-                 </div>
-              </td>
-              <td>
-                 <div class="w3-bar w3-light-grey">
-                    <button>Download</button>
-                 </div>
-              </td>
-              <td>
-                 <div class="w3-bar w3-light-grey">
-                  Compactness
-                 </div>
-              </td>
-              <td>
-                 <div class="w3-bar w3-light-grey">
-                  02/03/2018 at 14:56
-                 </div>
-              </td>
-           </tr>
+           </tr>   
         </table>
               </div>
         </div>

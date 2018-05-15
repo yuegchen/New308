@@ -61,6 +61,16 @@ public class RedistrictingController {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("Eclipselink_JPA");
 		EntityManager entitymanager = emfactory.createEntityManager();
 		state = entitymanager.find(State.class, 27);
+		//web statistics
+		entitymanager.getTransaction().begin(); 
+		Statistics stat = entitymanager.find(Statistics.class, 1);
+		if(state.getStateId()==9)
+			stat.setConnecticut(stat.getConnecticut()+1);
+		else if(state.getStateId()==25)
+			stat.setMassachusetts(stat.getMassachusetts()+1);
+		else
+			stat.setMinnesota(stat.getMinnesota()+1);;
+		entitymanager.getTransaction().commit();
 		
 		List<District> dList = state.initDistList();
 		
@@ -163,12 +173,26 @@ public class RedistrictingController {
 		List<Precinct> neighborPrecinctList = precinct.getNeighborPrecinctList();
 		System.err.println("neighborPrecinctList Size" + neighborPrecinctList.size());
 		System.err.println("Precinct id: " + precinct.getPid());
-		
+		boolean vioContiguity=true;
+		int oid=precinct.getCd();
+		precinct.setCd(d2.getDId());
 		for (Precinct p : neighborPrecinctList) {
+			List<Precinct> tempNeighborPrecinctList = p.getNeighborPrecinctList();
+			for(Precinct p2:tempNeighborPrecinctList){
+				if(p2.getCd()==p.getCd()){
+					vioContiguity=false;
+				}
+			}
+			if(vioContiguity){
+				precinct.setCd(oid);
+				return false;
+			}
 			if (p != null && p.getCd()==d2.getDId()) {
 				System.out.println("true");
+				precinct.setCd(oid);
 				return true;
 			}
+			
 			
 		}
 		return false;
@@ -227,9 +251,12 @@ public class RedistrictingController {
 
 	public double calculatePopulation(District d1,District d2, double weight) {
 		double popFairness=0;
-		int firstPop=d1.getPop();
-		int secondPop=d2.getPop();
+		double firstPop=d1.getPop();
+		double secondPop=d2.getPop();
+		System.err.println("firstPop: "+firstPop);
+		System.err.println("secondPop: "+secondPop);
 		popFairness=1-Math.abs(firstPop-secondPop)/(firstPop+secondPop);
+		System.err.println("popFairness: "+popFairness*weight);
 		return popFairness*weight;
 	}
 

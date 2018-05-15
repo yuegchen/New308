@@ -23,6 +23,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
+import com.vividsolutions.jts.geom.TopologyException;
 import com.vividsolutions.jts.precision.GeometryPrecisionReducer;
 
 import cse308.Thymeleaf.model.Type;
@@ -46,7 +47,11 @@ public class District {
     
     @Transient
     private List <Precinct> precinctList = new ArrayList <Precinct> (); //store precincts with their id
-
+    
+    @Transient
+    private List <Integer> nDistIdList = new ArrayList<Integer>();
+    @Transient
+    private List <District> nDistList = new ArrayList<District>();
 
     public District(int districtId, int stateId, List<Integer> inprecinctList, List <Precinct> borderingPrecinctList) {
         this.districtId = districtId;
@@ -59,7 +64,6 @@ public class District {
         this.districtId = districtId;
         this.stateId = stateId;
         System.out.println("districtId: " + districtId);
-        
         this.precinctList = initPrecList();
         this.borderingPrecinctList = initBorderingPrecinctList();
     }
@@ -76,22 +80,30 @@ public class District {
 		this.movedIntoPrecinctList=pList;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List<District> getNeighborDistricts(){
-	  EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
-	  EntityManager em = emf.createEntityManager();
-      List <?> nDistIdList = (List <?> ) em.createNativeQuery(
-    		  "SELECT nd.NDISTRICTID FROM NEIGHBOR_DISTRICT nd WHERE nd.DISTRICT_CD = ?1"
-    		  + " AND nd.SID = ?2")
-          .setParameter(1, districtId)
-          .setParameter(2, stateId)
-          .getResultList();
-      
-      List <District> nDistList = new ArrayList<District>();
-      for (int i = 0; i < nDistIdList.size(); i++) {
-          District district = new District((int)nDistIdList.get(i), stateId);
-          nDistList.add(district);
-      }
+	  if(nDistList.size() == 0){
+		  EntityManagerFactory emf = Persistence.createEntityManagerFactory("Eclipselink_JPA");
+		  EntityManager em = emf.createEntityManager();
+	      nDistIdList = (List<Integer> ) em.createNativeQuery(
+	    		  "SELECT nd.NDISTRICTID FROM NEIGHBOR_DISTRICT nd WHERE nd.DISTRICT_CD = ?1"
+	    		  + " AND nd.SID = ?2")
+	          .setParameter(1, districtId)
+	          .setParameter(2, stateId)
+	          .getResultList();
+	      
+	      for (int i = 0; i < nDistIdList.size(); i++) {
+	          District district = new District(nDistIdList.get(i), stateId);
+	          nDistList.add(district);
+	      }
+	  }
       return nDistList;
+	}
+	
+	public boolean isNeighbor(int districtId){
+		if(nDistIdList.size() == 0)
+			getNeighborDistricts();
+		return nDistIdList.contains(districtId);
 	}
 	
 //  @OneToMany(mappedBy = "district", cascade = CascadeType.ALL)
@@ -201,7 +213,6 @@ public class District {
 		EntityManager em = emf.createEntityManager();
 		double districtPerimeter = 0.0;
 		GeometryJSON			geometryJson	=	new GeometryJSON();
-		GeometryPrecisionReducer gpr			=	new GeometryPrecisionReducer(new PrecisionModel(10));
 		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
 		for(Precinct precinct: borderingPrecinctList){
 			List<Precinct> neighborPrecincts = precinct.getNeighborPrecinctList();
@@ -226,38 +237,65 @@ public class District {
 		for(Map.Entry<Integer, Integer> districtBorderPrecinctIds: map.entrySet()){
 			PrecinctGeometry precBound = em.find(PrecinctGeometry.class, districtBorderPrecinctIds.getValue());
 			PrecinctGeometry neighborPrecBound = em.find(PrecinctGeometry.class, districtBorderPrecinctIds.getKey());
-			districtPerimeter += getDistBorderPrecBoundIntPerimter(precBound, neighborPrecBound, geometryJson, gpr);
+			districtPerimeter += getDistBorderPrecBoundIntPerimter(precBound, neighborPrecBound, geometryJson);
 		}
 		StateGeometry stateBorder = em.find(StateGeometry.class, stateId);
 		for(int i = 0; i < borderingPrecinctList.size(); i++){
 			PrecinctGeometry precBound = em.find(PrecinctGeometry.class, borderingPrecinctList.get(i).getPid());
-			districtPerimeter += getStateBorderPrecBoundIntPerimeter(precBound, stateBorder, geometryJson, gpr);
+			districtPerimeter += getStateBorderPrecBoundIntPerimeter(precBound, stateBorder, geometryJson);
 		}
 		em.close();
 		return districtPerimeter;
 	}
 	
-	public double getDistBorderPrecBoundIntPerimter(PrecinctGeometry precBound, PrecinctGeometry distBorder, GeometryJSON geometryJson,
-			GeometryPrecisionReducer gpr) throws IOException{
-		Geometry intersection = gpr.reduce(PrecinctGeometry.getPrecinctGeometries(precBound, geometryJson)).intersection(
-				gpr.reduce(PrecinctGeometry.getPrecinctGeometries(distBorder, geometryJson)));
-		return getIntersectionPerimeter(intersection);
+	public double getDistBorderPrecBoundIntPerimter(PrecinctGeometry precBound, PrecinctGeometry distBorder, GeometryJSON geometryJson) 
+			throws IOException{
+		double perimeter = 0;
+		boolean isTopoExceptioned;
+		double precisionLevel = 10000;
+		do{
+			try{
+				Geometry intersection = GeometryPrecisionReducer.reduce(PrecinctGeometry.getPrecinctGeometries(precBound, geometryJson), 
+						new PrecisionModel(precisionLevel)).intersection(
+								GeometryPrecisionReducer.reduce(PrecinctGeometry.getPrecinctGeometries(distBorder, geometryJson),
+										new PrecisionModel(precisionLevel)));
+				isTopoExceptioned = false;
+				perimeter = getIntersectionPerimeter(intersection);
+			}catch(TopologyException e){
+				isTopoExceptioned = true;
+				precisionLevel /= 10;
+			}
+		}while(isTopoExceptioned);
+		return perimeter;
 	}
 	
-	public double getStateBorderPrecBoundIntPerimeter(PrecinctGeometry precBound, StateGeometry stateBorder, GeometryJSON geometryJson,
-			GeometryPrecisionReducer gpr) throws IOException{
+	public double getStateBorderPrecBoundIntPerimeter(PrecinctGeometry precBound, StateGeometry stateBorder, GeometryJSON geometryJson) 
+			throws IOException{
 		Polygon	stateGeometry = StateGeometry.getStateGeometry(stateBorder, geometryJson);
 		double perimeter = 0;
-		if(Type.valueOf(precBound.getType()).equals(Type.MULTIPOLYGON)){
-			Geometry precGeometry = (MultiPolygon) PrecinctGeometry.getPrecinctGeometries(precBound, geometryJson);
-			for(int i = 0; i < precGeometry.getNumGeometries(); i++){
-				perimeter += getIntersectionPerimeter(((gpr.reduce(((Polygon)precGeometry.getGeometryN(i)).getExteriorRing())).intersection(
-						gpr.reduce(stateGeometry.getExteriorRing()))));
+		boolean isTopoExceptioned;
+		double precisionLevel = 10000;
+		do{
+			try{
+				if(Type.valueOf(precBound.getType()).equals(Type.MULTIPOLYGON)){
+					Geometry precGeometry = (MultiPolygon) PrecinctGeometry.getPrecinctGeometries(precBound, geometryJson);
+					for(int i = 0; i < precGeometry.getNumGeometries(); i++){
+						perimeter += getIntersectionPerimeter(((GeometryPrecisionReducer.reduce(
+								((Polygon)precGeometry.getGeometryN(i)).getExteriorRing(), new PrecisionModel(precisionLevel)).intersection(
+								GeometryPrecisionReducer.reduce(stateGeometry.getExteriorRing(), new PrecisionModel(precisionLevel))))));
+					}
+				}else{
+					perimeter = getIntersectionPerimeter((GeometryPrecisionReducer.reduce(
+							((Polygon) PrecinctGeometry.getPrecinctGeometries(precBound, geometryJson)).getExteriorRing(),
+							new PrecisionModel(precisionLevel)).intersection(
+									GeometryPrecisionReducer.reduce(stateGeometry.getExteriorRing(), new PrecisionModel(precisionLevel)))));
+				}
+				isTopoExceptioned = false;
+			}catch(TopologyException e){
+				isTopoExceptioned = true;
+				precisionLevel /= 10;
 			}
-		}else{
-			perimeter = getIntersectionPerimeter((gpr.reduce(((Polygon) PrecinctGeometry.getPrecinctGeometries(precBound, geometryJson)).getExteriorRing())
-					.intersection(gpr.reduce(stateGeometry.getExteriorRing()))));
-		}
+		}while(isTopoExceptioned);
 		return perimeter;
 		
 	}
