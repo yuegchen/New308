@@ -84,6 +84,7 @@ public class State {
 				em.persist(new NeighborPrecinct(MAX_STATE_ID_INITIAL-stateId, precincts.get(i)));
 			}
 			em.getTransaction().commit();
+			System.out.println("first precinct reached");
 		}
 		em.close();
 	}

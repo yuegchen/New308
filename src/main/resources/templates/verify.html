@@ -54,7 +54,14 @@
             
          </div>
          <div class="w3-row-padding">
-            
+            <form th:action="@{/verify}"
+               th:object="${verifyForm}" method="POST">
+              <span style="font-size: 10pt">Enter your token here:</span>
+              <input id="Text1" name="login" type="text" th:field="*{token}" />
+              <input id="Button1" style="width: 70px; margin-top: 15px; margin-right: 10px;" type="submit" value="Verify" />
+              <br />
+          </form>
+
             <div class="w3-col l3 m6 w3-margin-bottom">
                <img th:src="@{/image/dog.jpg}" alt="Seward" style="width:100%">
                <h3>Seward Chen</h3>
