@@ -122,6 +122,7 @@ public class RedistrictController {
 		private EntityManager em = emf.createEntityManager();	
 		private int	steps = 0;
 		private int nonSteps = 0;
+		private int lastGood=1;
 
 		@SuppressWarnings("unchecked")
 		@Override
@@ -222,14 +223,17 @@ public class RedistrictController {
 				
 				System.out.println("new Score: "+newScore);
 				 Random rand = new Random();
-				int i = rand.nextInt(10)+1;
-//				if(steps%i==0){
-				if (newScore > originalScore) {
+				 
+				
+				if(steps==lastGood){
+//				if (newScore > originalScore) {
 //					fromDistrict.setCompactness(rh.calculateCompactness(fromDistrict, 1));
 //					toDistrict.setCompactness(rh.calculateCompactness(toDistrict, 1));
 //					fromDistrict.setEfficiencyGap(1-rh.calculatePoliticalFairness(fromDistrict, 1));
 //					toDistrict.setCompactness(1-rh.calculatePoliticalFairness(toDistrict, 1));
 					originalScore=newScore;
+					int i = rand.nextInt(4)+3;
+					lastGood=steps+i;
 					nonSteps=0;
 				}
 				else{
